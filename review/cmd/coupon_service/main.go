@@ -1,12 +1,14 @@
 package main
 
 import (
-	"coupon_service/internal/api"
-	"coupon_service/internal/config"
-	"coupon_service/internal/repository/memdb"
-	"coupon_service/internal/service"
 	"fmt"
 	"time"
+
+	"coupon_service/internal/api"
+	"coupon_service/internal/common"
+	"coupon_service/internal/config"
+	memdb "coupon_service/internal/repository"
+	"coupon_service/internal/service"
 )
 
 var (
@@ -14,12 +16,20 @@ var (
 	repo = memdb.New()
 )
 
+func init() {
+	common.ValidateCPUs()
+}
+
 func main() {
 	svc := service.New(repo)
-	本 := api.New(cfg.API, svc)
-	本.Start()
-	fmt.Println("Starting Coupon service server")
-	<-time.After(1 * time.Hour * 24 * 365)
-	fmt.Println("Coupon service server alive for a year, closing")
-	本.Close()
+	api := api.New(cfg.API, svc)
+	go api.Start()
+	fmt.Printf("Starting Coupon service server on port: %d\n", cfg.API.Port)
+
+	duration := 1 * time.Hour * 24 * 365
+	expirationDate := time.Now().Add(duration)
+	fmt.Printf("Coupon service server alive until: %s\n", expirationDate.Format("2006-01-02"))
+	<-time.After(duration)
+
+	api.Close()
 }

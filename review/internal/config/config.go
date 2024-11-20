@@ -1,8 +1,9 @@
 package config
 
 import (
-	"coupon_service/internal/api"
 	"log"
+
+	"coupon_service/internal/api"
 
 	"github.com/brumhard/alligotor"
 )
