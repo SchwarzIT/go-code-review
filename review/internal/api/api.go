@@ -2,19 +2,21 @@ package api
 
 import (
 	"context"
-	"coupon_service/internal/service/entity"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
+
+	"coupon_service/internal/entity"
 )
 
 type Service interface {
-	ApplyCoupon(entity.Basket, string) (*entity.Basket, error)
-	CreateCoupon(int, string, int) any
-	GetCoupons([]string) ([]entity.Coupon, error)
+	ApplyCoupon(*entity.Basket, string) error
+	CreateCoupon(int, string, int) error
+	GetCoupons([]string) []entity.Coupon
+	GetCoupon(string) (*entity.Coupon, error)
 }
 
 type Config struct {
@@ -29,6 +31,8 @@ type API struct {
 	CFG Config
 }
 
+// New creates a new instance of the API, initializes the router, sets up routes, and configures the server.
+// It accepts a configuration struct and a service that implements the Service interface.
 func New[T Service](cfg Config, svc T) API {
 	gin.SetMode(gin.ReleaseMode)
 	r := new(gin.Engine)
@@ -39,15 +43,16 @@ func New[T Service](cfg Config, svc T) API {
 		MUX: r,
 		CFG: cfg,
 		svc: svc,
-	}.withServer()
+	}.withRoutes().withServer()
 }
 
+// withServer configures the HTTP server for the API, binding it to the host and port specified in the configuration.
+// It starts the server in a separate goroutine and returns the API instance.
 func (a API) withServer() API {
-
 	ch := make(chan API)
 	go func() {
 		a.srv = &http.Server{
-			Addr:    fmt.Sprintf(":%d", a.CFG.Port),
+			Addr:    fmt.Sprintf("%s:%d", a.CFG.Host, a.CFG.Port),
 			Handler: a.MUX,
 		}
 		ch <- a
@@ -56,6 +61,8 @@ func (a API) withServer() API {
 	return <-ch
 }
 
+// withRoutes defines the API routes for handling requests and returns the API instance.
+// It includes endpoints for applying, creating, and retrieving coupons.
 func (a API) withRoutes() API {
 	apiGroup := a.MUX.Group("/api")
 	apiGroup.POST("/apply", a.Apply)
@@ -64,12 +71,17 @@ func (a API) withRoutes() API {
 	return a
 }
 
+// Start begins serving HTTP requests on the specified address.
+// It listens on the server's configured host and port, logging any critical errors if the server fails to start.
 func (a API) Start() {
+	log.Println(a.srv.Addr)
 	if err := a.srv.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
 }
 
+// Close gracefully shuts down the HTTP server within a 5-second timeout period.
+// This allows ongoing requests to complete before the server stops.
 func (a API) Close() {
 	<-time.After(5 * time.Second)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
