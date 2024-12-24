@@ -36,10 +36,19 @@ func (a *API) Create(c *gin.Context) {
 
 func (a *API) Get(c *gin.Context) {
 	codes := c.Query("codes")
+	if codes == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "query parameter 'codes' is required"})
+		return
+	}
 	codeList := strings.Split(codes, ",")
+	if len(codeList) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "query parameter 'codes' cannot be empty"})
+		return
+	}
 
-	coupons, err := a.svc.GetCoupons(codeList...)
+	coupons, err := a.svc.GetCoupons(codeList)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve coupons"})
 		return
 	}
 	c.JSON(http.StatusOK, coupons)

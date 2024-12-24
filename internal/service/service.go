@@ -54,7 +54,7 @@ func (s Service) CreateCoupon(discount int, code string, minBasketValue int) (st
 	return coupon.ID, nil
 }
 
-func (s Service) GetCoupons(codes ...string) ([]Coupon, error) {
+func (s Service) GetCoupons(codes []string) ([]Coupon, error) {
 	coupons := make([]Coupon, 0, len(codes))
 	var e error
 
