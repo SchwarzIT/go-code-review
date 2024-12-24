@@ -24,8 +24,8 @@ func New() (Config, error) {
 		return cfg, fmt.Errorf("failed to load config: %w", err)
 	}
 
-	if cfg.API.Host == "" || cfg.API.Port == "" {
-		return cfg, fmt.Errorf("critical environment variable API_HOST or API_PORT is missing")
+	if cfg.API.Port == "" {
+		return cfg, fmt.Errorf("critical environment variable API_PORT is missing")
 	}
 
 	return cfg, nil
