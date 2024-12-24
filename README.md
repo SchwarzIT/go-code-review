@@ -6,14 +6,14 @@ This repository was created from the repository at https://github.com/SchwarzIT/
 
 Configure the application using environment variables with support for a `.env` file and default values.
 
-### 🌐 Environment Variables
+### Environment Variables
 
 - **`API_PORT`**
   - **Default:** `8080`
 - **`API_ENV`**
   - **Default:** `dev`
 
-### 📄 `.env` File
+### `.env` File
 
 Create a `.env` file in the project root to set default values:
 
@@ -22,7 +22,7 @@ API_PORT=9090
 API_ENV=production
 ```
 
-### 🔄 Precedence
+### Precedence
 
 1. **System Environment Variables** override `.env` values.
 2. **`.env` File** provides defaults.
@@ -34,7 +34,7 @@ API_ENV=production
 - System sets `API_PORT=7070`
 - **Effective `API_PORT`:** `7070`
 
-## Releases
+## 📄 Releases
 
 The releases folder is used to store version-specific metadata for project updates, such as features, improvements, and bug fixes. Each release file is structured using the standard template located at ./templates/release.toml.
 
