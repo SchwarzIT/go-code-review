@@ -19,7 +19,7 @@ type Service interface {
 
 type Config struct {
 	Host string
-	Port int
+	Port string
 }
 
 type API struct {
