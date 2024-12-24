@@ -1,0 +1,32 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+"""
+
+## Each release file must focus on a single type of digest (Features, Improvements, or Bugs) Delete the others that you will not use
+[[Digest.Features]]
+Name = ""
+Issue = 0
+Description = """
+
+"""
+
+[[Digest.Improvements]]
+Name = ""
+Issue = 0
+Description = """
+
+"""
+
+
+[[Digest.Bugs]]
+Name = ""
+Issue = 0
+Description = """
+
+"""
