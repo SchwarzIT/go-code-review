@@ -3,6 +3,7 @@ package api
 import (
 	. "coupon_service/internal/api/entity"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,19 +26,19 @@ func (a *API) Create(c *gin.Context) {
 	if err := c.ShouldBindJSON(&apiReq); err != nil {
 		return
 	}
-	err := a.svc.CreateCoupon(apiReq.Discount, apiReq.Code, apiReq.MinBasketValue)
+	id, err := a.svc.CreateCoupon(apiReq.Discount, apiReq.Code, apiReq.MinBasketValue)
 	if err != nil {
 		return
 	}
 	c.Status(http.StatusOK)
+	c.Writer.Write([]byte(id))
 }
 
 func (a *API) Get(c *gin.Context) {
-	apiReq := CouponRequest{}
-	if err := c.ShouldBindJSON(&apiReq); err != nil {
-		return
-	}
-	coupons, err := a.svc.GetCoupons(apiReq.Codes)
+	codes := c.Query("codes")
+	codeList := strings.Split(codes, ",")
+
+	coupons, err := a.svc.GetCoupons(codeList...)
 	if err != nil {
 		return
 	}

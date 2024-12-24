@@ -13,8 +13,8 @@ import (
 
 type Service interface {
 	ApplyCoupon(entity.Basket, string) (*entity.Basket, error)
-	CreateCoupon(int, string, int) any
-	GetCoupons([]string) ([]entity.Coupon, error)
+	CreateCoupon(int, string, int) (string, error)
+	GetCoupons(...string) ([]entity.Coupon, error)
 }
 
 type Config struct {
@@ -30,30 +30,20 @@ type API struct {
 }
 
 func New[T Service](cfg Config, svc T) API {
-	gin.SetMode(gin.ReleaseMode)
-	r := new(gin.Engine)
-	r = gin.New()
-	r.Use(gin.Recovery())
-
+	r := gin.Default()
 	return API{
 		MUX: r,
 		CFG: cfg,
 		svc: svc,
-	}.withServer()
+	}.withServer().withRoutes()
 }
 
 func (a API) withServer() API {
-
-	ch := make(chan API)
-	go func() {
-		a.srv = &http.Server{
-			Addr:    fmt.Sprintf(":%d", a.CFG.Port),
-			Handler: a.MUX,
-		}
-		ch <- a
-	}()
-
-	return <-ch
+	a.srv = &http.Server{
+		Addr:    fmt.Sprintf(":%d", a.CFG.Port),
+		Handler: a.MUX,
+	}
+	return a
 }
 
 func (a API) withRoutes() API {

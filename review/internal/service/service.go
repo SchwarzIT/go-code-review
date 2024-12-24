@@ -40,7 +40,7 @@ func (s Service) ApplyCoupon(basket Basket, code string) (b *Basket, e error) {
 	return nil, fmt.Errorf("Tried to apply discount to negative value")
 }
 
-func (s Service) CreateCoupon(discount int, code string, minBasketValue int) any {
+func (s Service) CreateCoupon(discount int, code string, minBasketValue int) (string, error) {
 	coupon := Coupon{
 		Discount:       discount,
 		Code:           code,
@@ -49,14 +49,14 @@ func (s Service) CreateCoupon(discount int, code string, minBasketValue int) any
 	}
 
 	if err := s.repo.Save(coupon); err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return coupon.ID, nil
 }
 
-func (s Service) GetCoupons(codes []string) ([]Coupon, error) {
+func (s Service) GetCoupons(codes ...string) ([]Coupon, error) {
 	coupons := make([]Coupon, 0, len(codes))
-	var e error = nil
+	var e error
 
 	for idx, code := range codes {
 		coupon, err := s.repo.FindByCode(code)
