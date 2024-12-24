@@ -13,10 +13,7 @@ Improve the config and add test
 
 
 [[Digest.Improvements]]
-Name = "improve-endpoind-API-response"
-Issue = 4
-Description = """
-    - get config values also from env file
-
-"""
+Name = "Improve the config"
+Issue = 5
+Description = """get config values also from env file, add test to config setup default values"""
 
