@@ -1,9 +1,3 @@
-# Schwarz IT Code Review Repository
+# Overview
 
-This repository is meant to be used in the onboarding process of Go developers
-applying to Schwarz IT.
-
-Code smells and security issues are made on purpose. All the code to be reviewed is
-in the [review](review) directory.
-
-
+This repository was created from the repository at https://github.com/SchwarzIT/go-code-review to make corrections and improvements
