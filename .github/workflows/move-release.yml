@@ -1,0 +1,43 @@
+name: Move release file into `releases` folder
+
+on:
+  push:
+    branches:
+      - main # or whichever branch you merge into
+
+jobs:
+  move_release_file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: true # needed to push back to the repo
+
+      - name: Move file to releases folder and rename with timestamp
+        run: |
+          # Timestamp format: YYYYMMDDHHMMSS
+          TIMESTAMP=$(date +'%Y%m%d%H%M%S')
+
+          # Adjust these paths to match your setup
+          RELEASE_SOURCE_FILE="release.toml"
+          RELEASE_FOLDER="releases"
+          RELEASE_TARGET_FILE="releases_${TIMESTAMP}.toml"
+
+          # Create the releases folder if it doesn't exist
+          mkdir -p "${RELEASE_FOLDER}"
+
+          # Move or copy the file (depending on whether you want to preserve the original)
+          cp "${RELEASE_SOURCE_FILE}" "${RELEASE_FOLDER}/${RELEASE_TARGET_FILE}"
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add "${RELEASE_FOLDER}/${RELEASE_TARGET_FILE}"
+          git commit -m "Add new release file ${RELEASE_TARGET_FILE}"
+          git push
+        env:
+          # This lets you push using the GitHub Actions token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

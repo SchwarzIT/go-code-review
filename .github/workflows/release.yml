@@ -23,16 +23,3 @@ jobs:
 
       - name: Validate release.toml
         run: go run scripts/validate_release.go
-
-  merge:
-    needs: validate
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Move release.toml
-        run: |
-          mv release.toml releases/$(date +%s)_release.toml
