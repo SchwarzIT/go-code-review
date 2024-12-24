@@ -18,8 +18,8 @@ type Service interface {
 }
 
 type Config struct {
-	Port string `env:"API_PORT" default:"8080"`
-	Env  string `env:"API_ENV"  default:"dev"`
+	Port string `env:"API_PORT"`
+	Env  string `env:"API_ENV"`
 }
 
 type API struct {
