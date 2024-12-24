@@ -6,17 +6,22 @@ import (
 	"coupon_service/internal/repository/memdb"
 	"coupon_service/internal/service"
 	"fmt"
+	"log"
 	"time"
 )
 
 var (
-	cfg  = config.New()
 	repo = memdb.New()
 )
 
 func main() {
+	cfg, err := config.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	svc := service.New(repo)
-	fmt.Println(cfg)
+
 	server := api.New(cfg.API, svc)
 	server.Start()
 	fmt.Println("Starting Coupon service server")
