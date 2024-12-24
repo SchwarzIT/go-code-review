@@ -14,12 +14,12 @@ import (
 type Service interface {
 	ApplyCoupon(entity.Basket, string) (*entity.Basket, error)
 	CreateCoupon(int, string, int) (string, error)
-	GetCoupons(...string) ([]entity.Coupon, error)
+	GetCoupons([]string) ([]entity.Coupon, error)
 }
 
 type Config struct {
-	Host string
-	Port int
+	Port string `env:"API_PORT" default:"8080"`
+	Env  string `env:"API_ENV"  default:"dev"`
 }
 
 type API struct {
@@ -40,7 +40,7 @@ func New[T Service](cfg Config, svc T) API {
 
 func (a API) withServer() API {
 	a.srv = &http.Server{
-		Addr:    fmt.Sprintf(":%d", a.CFG.Port),
+		Addr:    fmt.Sprintf(":%s", a.CFG.Port),
 		Handler: a.MUX,
 	}
 	return a

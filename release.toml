@@ -1,0 +1,19 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Improve the config and add test
+"""
+
+## Each release file must focus on a single type of digest (Features, Improvements, or Bugs) Delete the others that you will not use
+
+
+[[Digest.Improvements]]
+Name = "Improve the config"
+Issue = 5
+Description = """get config values also from env file, add test to config setup default values"""
+
