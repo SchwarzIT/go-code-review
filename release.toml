@@ -6,13 +6,13 @@ Release_file_version = "2.1"
 [Description]
 
 Notes = """
-Improve the pipeline
+Remove the release file from the root dir
 """
 
 
 [[Digest.Bugs]]
-Name = "Improve the pipeline"
-Issue = 2
+Name = "bug: Remove the file"
+Issue = 3
 Description = """
-This we will mv the file instead just copy to release folder
+The release file is root directory after was moved to release folders, fixing that
 """
