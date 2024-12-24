@@ -1,0 +1,51 @@
+name: Go Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Go Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Go environment
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.18 # Specify your Go version here
+
+      # Step 3: Cache Go modules to speed up builds
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            # Cache the Go modules based on the go.sum file
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        run: go mod tidy
+
+      # Step 5: Run tests with coverage
+      - name: Run Tests
+        run: |
+          go test -v ./... -coverprofile=coverage.out
+
+      # Step 6: Upload coverage results (optional)
+      - name: Upload Coverage
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage.out
