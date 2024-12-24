@@ -9,7 +9,7 @@ Configure the application using environment variables with support for a `.env` 
 ### Environment Variables
 
 - **`API_PORT`**
-  - **Default:** `8080`
+  - **required**
 - **`API_ENV`**
   - **Default:** `dev`
 
