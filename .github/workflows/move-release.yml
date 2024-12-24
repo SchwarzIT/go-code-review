@@ -31,7 +31,7 @@ jobs:
           echo "Using TIMESTAMP=$TIMESTAMP"
           echo "Copying $RELEASE_SOURCE_FILE to $RELEASE_FOLDER/$RELEASE_TARGET_FILE"
           mkdir -p "$RELEASE_FOLDER"
-          cp "$RELEASE_SOURCE_FILE" "$RELEASE_FOLDER/$RELEASE_TARGET_FILE"
+          mv "$RELEASE_SOURCE_FILE" "$RELEASE_FOLDER/$RELEASE_TARGET_FILE"
 
       - name: Commit and push changes
         run: |
