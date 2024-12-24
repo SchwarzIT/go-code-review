@@ -6,13 +6,13 @@ Release_file_version = "2.1"
 [Description]
 
 Notes = """
-This is the first Merge request
+Improve the pipeline
 """
 
 
 [[Digest.Bugs]]
-Name = "Fix main bugs"
-Issue = 1
+Name = "Improve the pipeline"
+Issue = 2
 Description = """
-
+This we will mv the file instead just copy to release folder
 """
