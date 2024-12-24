@@ -38,7 +38,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Remove old file from Git (if it was already tracked)
+          git rm --cached "$RELEASE_SOURCE_FILE" || true
+
+
           git add "$RELEASE_FOLDER/$RELEASE_TARGET_FILE"
+
           git commit -m "Add new release file $RELEASE_TARGET_FILE"
           git push
         env:
