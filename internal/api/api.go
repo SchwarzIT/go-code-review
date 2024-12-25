@@ -76,6 +76,7 @@ func initializeGinEngine(env mytypes.Environment, logger *zap.Logger) *gin.Engin
 			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
 			AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 			AllowCredentials: true,
+			MaxAge:           time.Duration(10) * time.Second,
 		}))
 	} else {
 		router = gin.Default()
