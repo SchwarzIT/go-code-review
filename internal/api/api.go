@@ -2,7 +2,7 @@ package api
 
 import (
 	"context"
-	"coupon_service/internal/myduration"
+	"coupon_service/internal/mytypes"
 	"coupon_service/internal/service/entity"
 	"fmt"
 	"net/http"
@@ -17,10 +17,10 @@ type Service interface {
 }
 
 type Config struct {
-	Port            string                `env:"API_PORT"`
-	Env             string                `env:"API_ENV"`
-	TimeAlive       myduration.MyDuration `env:"API_TIMEALIVE"`
-	ShutdownTimeout myduration.MyDuration `env:"API_SHUTDOWNTIMEOUT"`
+	Port            string              `env:"API_PORT"`
+	Env             mytypes.Environment `env:"API_ENV"`
+	TimeAlive       mytypes.MyDuration  `env:"API_TIMEALIVE"`
+	ShutdownTimeout mytypes.MyDuration  `env:"API_SHUTDOWNTIMEOUT"`
 }
 
 type API struct {

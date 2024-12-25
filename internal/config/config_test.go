@@ -3,7 +3,7 @@ package config_test
 
 import (
 	"coupon_service/internal/config"
-	"coupon_service/internal/myduration"
+	"coupon_service/internal/mytypes"
 	"os"
 	"path/filepath"
 	"testing"
@@ -56,8 +56,8 @@ func TestNewConfig(t *testing.T) {
 
 				// Assert the values loaded from .env
 				assert.Equal(t, "9090", cfg.API.Port, "API.Port should be loaded from .env")
-				assert.Equal(t, "production", cfg.API.Env, "API.Env should be loaded from .env")
-				assert.Equal(t, time.Duration(1)*time.Hour*myduration.HoursInDay*myduration.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TIMEALIVE should be loaded from system environment")
+				assert.Equal(t, mytypes.Production, cfg.API.Env, "API.Env should be loaded from .env")
+				assert.Equal(t, time.Duration(1)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TIMEALIVE should be loaded from system environment")
 
 				// Cleanup: Unset environment variables set by .env
 				t.Cleanup(func() {
@@ -73,7 +73,7 @@ func TestNewConfig(t *testing.T) {
 
 				// Set environment variables using t.Setenv for automatic cleanup
 				t.Setenv("API_PORT", "7070")
-				t.Setenv("API_ENV", "staging")
+				t.Setenv("API_ENV", "development")
 				t.Setenv("API_TIMEALIVE", "1y")
 
 				// Load config without a .env file
@@ -82,8 +82,8 @@ func TestNewConfig(t *testing.T) {
 
 				// Assert the values loaded from system environment
 				assert.Equal(t, "7070", cfg.API.Port, "API.Port should be loaded from system environment")
-				assert.Equal(t, "staging", cfg.API.Env, "API.Env should be loaded from system environment")
-				assert.Equal(t, time.Duration(1)*time.Hour*myduration.HoursInDay*myduration.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TIMEALIVE should be loaded from system environment")
+				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should be loaded from system environment")
+				assert.Equal(t, time.Duration(1)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TIMEALIVE should be loaded from system environment")
 			},
 		},
 		{
@@ -106,7 +106,7 @@ func TestNewConfig(t *testing.T) {
 
 				// Assert that API_PORT is overridden and API_ENV comes from .env
 				assert.Equal(t, "6060", cfg.API.Port, "API.Port should be overridden by system environment")
-				assert.Equal(t, "development", cfg.API.Env, "API.Env should be loaded from .env")
+				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should be loaded from .env")
 			},
 		},
 		{
@@ -116,7 +116,7 @@ func TestNewConfig(t *testing.T) {
 				clearEnvVars(t)
 
 				// Set only API_ENV to test missing API_PORT
-				t.Setenv("API_ENV", "test")
+				t.Setenv("API_ENV", "development")
 
 				// Attempt to load config without API_PORT
 				cfg, err := config.NewDefault("")
@@ -141,7 +141,7 @@ func TestNewConfig(t *testing.T) {
 
 				// Assert that API_ENV uses the default value
 				assert.Equal(t, "5050", cfg.API.Port, "API.Port should be loaded from system environment")
-				assert.Equal(t, "dev", cfg.API.Env, "API.Env should use default value 'dev'")
+				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should use default value 'dev'")
 			},
 		},
 		{
@@ -152,7 +152,7 @@ func TestNewConfig(t *testing.T) {
 
 				// Set environment variables without a .env file
 				t.Setenv("API_PORT", "4040")
-				t.Setenv("API_ENV", "qa")
+				t.Setenv("API_ENV", "development")
 
 				// Load config without a .env file
 				cfg, err := config.NewDefault("")
@@ -160,7 +160,7 @@ func TestNewConfig(t *testing.T) {
 
 				// Assert that values are loaded from system environment
 				assert.Equal(t, "4040", cfg.API.Port, "API.Port should be loaded from system environment")
-				assert.Equal(t, "qa", cfg.API.Env, "API.Env should be loaded from system environment")
+				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should be loaded from system environment")
 			},
 		},
 	}
