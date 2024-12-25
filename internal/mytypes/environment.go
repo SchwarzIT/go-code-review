@@ -22,7 +22,6 @@ const (
 // It allows configuration libraries to parse environment strings directly into the Environment type.
 func (e *Environment) UnmarshalText(text []byte) error {
 	parsedEnv := strings.ToLower(strings.TrimSpace(string(text)))
-
 	switch parsedEnv {
 	case string(Development), string(Production):
 		*e = Environment(parsedEnv)

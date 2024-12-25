@@ -1,0 +1,21 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+add new features to api
+"""
+
+
+
+[[Digest.Improvements]]
+Name = "7-improve-gin-api"
+Issue = 7
+Description = """
+Implement production and development environment and introduce allow origins
+"""
+
+
