@@ -1,6 +1,6 @@
 module coupon_service
 
-go 1.18
+go 1.20
 
 require (
 	github.com/brumhard/alligotor v0.3.3
