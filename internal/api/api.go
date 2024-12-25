@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"coupon_service/internal/myduration"
 	"coupon_service/internal/service/entity"
 	"fmt"
 	"log"
@@ -18,8 +19,9 @@ type Service interface {
 }
 
 type Config struct {
-	Port string `env:"API_PORT" default:"8080"`
-	Env  string `env:"API_ENV"  default:"dev"`
+	Port      string                `env:"API_PORT"`
+	Env       string                `env:"API_ENV"`
+	TimeAlive myduration.MyDuration `env:"API_TIMEALIVE"`
 }
 
 type API struct {
@@ -54,10 +56,12 @@ func (a API) withRoutes() API {
 	return a
 }
 
-func (a API) Start() {
-	if err := a.srv.ListenAndServe(); err != nil {
-		log.Fatal(err)
+func (a API) Start() (err error) {
+	err = a.srv.ListenAndServe()
+	if err != nil {
+		return
 	}
+	return
 }
 
 func (a API) Close() {

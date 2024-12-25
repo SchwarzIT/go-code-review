@@ -92,3 +92,7 @@ docs/generated/
 
 # Cache directories
 .cache/
+
+
+# Ignore personal test file
+test2.go

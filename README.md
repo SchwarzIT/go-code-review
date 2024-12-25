@@ -12,6 +12,9 @@ Configure the application using environment variables with support for a `.env` 
   - **required**
 - **`API_ENV`**
   - **Default:** `dev`
+- **`API_TIMEALIVE`**
+  - **Default:** `1y`
+  - **Format:** Specify the duration using units like s (seconds), m (minutes), h (hours), d (days), w (weeks), or y (years). Example: 10d 10w 1y.
 
 ### `.env` File
 
@@ -20,6 +23,7 @@ Create a `.env` file in the project root to set default values:
 ```dotenv
 API_PORT=9090
 API_ENV=production
+API_TIMEALIVE=1y
 ```
 
 ### Precedence
