@@ -19,7 +19,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.20 # Specify your Go version here
+          go-version: '1.22.4' # Updated Go version to match toolchain
 
       # Step 3: Cache Go modules to speed up builds
       - name: Cache Go modules
@@ -27,15 +27,32 @@ jobs:
         with:
           path: |
             ~/.cache/go-build
-            # Cache the Go modules based on the go.sum file
             ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-1.22.4
           restore-keys: |
+            ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-
             ${{ runner.os }}-go-
+            ${{ runner.os }}-
 
       # Step 4: Install dependencies
       - name: Install dependencies
         run: go mod tidy
+
+      # Optional Step: Verify Go Modules
+      - name: Verify Go Modules
+        run: go mod verify
+
+      # Optional Step: Run GoLint
+      - name: Run GoLint
+        run: |
+          go install golang.org/x/lint/golint@latest
+          golint ./...
+
+      # Optional Step: Run Static Analysis
+      - name: Run Static Analysis
+        run: |
+          go install github.com/securego/gosec/v2/cmd/gosec@latest
+          gosec ./...
 
       # Step 5: Run tests with coverage
       - name: Run Tests
