@@ -28,7 +28,10 @@ func main() {
 	repo := memdb.New()
 	svc := service.New(repo)
 
-	server := api.New(cfg.API, svc)
+	server, err := api.New(cfg.API, svc)
+	if err != nil {
+		log.Fatalf("Failed to setup the server: %v", err)
+	}
 
 	serverErrors := make(chan error, 1)
 
