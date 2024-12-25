@@ -44,22 +44,17 @@ func TestNewConfig(t *testing.T) {
 		{
 			name: "FromDotEnv",
 			test: func(t *testing.T) {
-				// Clear environment variables
 				clearEnvVars(t)
 
-				// Create a temporary .env file
 				envContent := "API_PORT=9090\nAPI_ENV=production\nAPI_TIME_ALIVE=1y\nAPI_TIMEALIVE=1y\n"
 				envPath := createTempEnvFile(t, envContent)
-				// Load the .env file
 				cfg, err := config.NewDefault(envPath)
 				assert.NoError(t, err, "Expected no error when loading config from .env")
 
-				// Assert the values loaded from .env
 				assert.Equal(t, "9090", cfg.API.Port, "API.Port should be loaded from .env")
 				assert.Equal(t, mytypes.Production, cfg.API.Env, "API.Env should be loaded from .env")
 				assert.Equal(t, time.Duration(1)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TIMEALIVE should be loaded from system environment")
 
-				// Cleanup: Unset environment variables set by .env
 				t.Cleanup(func() {
 					clearEnvVars(t)
 				})
@@ -68,19 +63,15 @@ func TestNewConfig(t *testing.T) {
 		{
 			name: "FromSystemEnv",
 			test: func(t *testing.T) {
-				// Clear environment variables
 				clearEnvVars(t)
 
-				// Set environment variables using t.Setenv for automatic cleanup
 				t.Setenv("API_PORT", "7070")
 				t.Setenv("API_ENV", "development")
 				t.Setenv("API_TIMEALIVE", "1y")
 
-				// Load config without a .env file
 				cfg, err := config.NewDefault("")
 				assert.NoError(t, err, "Expected no error when loading config from system environment")
 
-				// Assert the values loaded from system environment
 				assert.Equal(t, "7070", cfg.API.Port, "API.Port should be loaded from system environment")
 				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should be loaded from system environment")
 				assert.Equal(t, time.Duration(1)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TIMEALIVE should be loaded from system environment")
@@ -89,22 +80,16 @@ func TestNewConfig(t *testing.T) {
 		{
 			name: "OverrideEnv",
 			test: func(t *testing.T) {
-				// Clear environment variables
 				clearEnvVars(t)
 
-				// Create a temporary .env file
 				envContent := "API_PORT=8080\nAPI_ENV=development\n"
 				envPath := createTempEnvFile(t, envContent)
 
-				// Set environment variables that should override .env
 				t.Setenv("API_PORT", "6060")
-				// Note: Not setting API_ENV to ensure it comes from .env
 
-				// Load the .env file with overrides
 				cfg, err := config.NewDefault(envPath)
 				assert.NoError(t, err, "Expected no error when loading config with override")
 
-				// Assert that API_PORT is overridden and API_ENV comes from .env
 				assert.Equal(t, "6060", cfg.API.Port, "API.Port should be overridden by system environment")
 				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should be loaded from .env")
 			},
@@ -112,13 +97,10 @@ func TestNewConfig(t *testing.T) {
 		{
 			name: "MissingCriticalPort",
 			test: func(t *testing.T) {
-				// Clear environment variables
 				clearEnvVars(t)
 
-				// Set only API_ENV to test missing API_PORT
 				t.Setenv("API_ENV", "development")
 
-				// Attempt to load config without API_PORT
 				cfg, err := config.NewDefault("")
 				assert.Error(t, err, "Expected error due to missing API_PORT")
 				assert.Contains(t, err.Error(), "critical environment variable API_PORT is missing", "Error message should indicate missing API_PORT")
@@ -128,16 +110,12 @@ func TestNewConfig(t *testing.T) {
 		{
 			name: "InvalidEnvironment",
 			test: func(t *testing.T) {
-				// Clear environment variables
 				clearEnvVars(t)
 
-				// Set invalid API_ENV
 				t.Setenv("API_ENV", "matheus")
 
-				// Set environment variables that should override .env
 				t.Setenv("API_PORT", "6060")
 
-				// Attempt to load config without API_PORT
 				_, err := config.NewDefault("")
 				assert.Error(t, err, "Expected error due to missing API_PORT")
 				assert.Contains(t, err.Error(), "invalid environment provided, defaulting to development", "Error message should indicate invalid ENV")
@@ -146,18 +124,13 @@ func TestNewConfig(t *testing.T) {
 		{
 			name: "DefaultValues",
 			test: func(t *testing.T) {
-				// Clear environment variables
 				clearEnvVars(t)
 
-				// Set only API_PORT to test default for API_ENV
 				t.Setenv("API_PORT", "5050")
-				// Do not set API_ENV to use default
 
-				// Load config without a .env file
 				cfg, err := config.NewDefault("")
 				assert.NoError(t, err, "Expected no error when loading config with default values")
 
-				// Assert that API_ENV uses the default value
 				assert.Equal(t, "5050", cfg.API.Port, "API.Port should be loaded from system environment")
 				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should use default value 'dev'")
 			},
@@ -165,27 +138,23 @@ func TestNewConfig(t *testing.T) {
 		{
 			name: "NoDotEnv",
 			test: func(t *testing.T) {
-				// Clear environment variables
+
 				clearEnvVars(t)
 
-				// Set environment variables without a .env file
 				t.Setenv("API_PORT", "4040")
 				t.Setenv("API_ENV", "development")
 
-				// Load config without a .env file
 				cfg, err := config.NewDefault("")
 				assert.NoError(t, err, "Expected no error when .env is missing but variables are set via system environment")
 
-				// Assert that values are loaded from system environment
 				assert.Equal(t, "4040", cfg.API.Port, "API.Port should be loaded from system environment")
 				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should be loaded from system environment")
 			},
 		},
 	}
 
-	// Iterate over each subtest and execute them in sequence
 	for _, tc := range subtests {
-		tc := tc // capture range variable
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			tc.test(t)
 		})
