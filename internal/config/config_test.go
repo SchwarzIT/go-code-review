@@ -3,9 +3,11 @@ package config_test
 
 import (
 	"coupon_service/internal/config"
+	"coupon_service/internal/myduration"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -46,9 +48,8 @@ func TestNewConfig(t *testing.T) {
 				clearEnvVars(t)
 
 				// Create a temporary .env file
-				envContent := "API_PORT=9090\nAPI_ENV=production\n"
+				envContent := "API_PORT=9090\nAPI_ENV=production\nAPI_TIME_ALIVE=1y\nAPI_TIMEALIVE=1y\n"
 				envPath := createTempEnvFile(t, envContent)
-
 				// Load the .env file
 				cfg, err := config.New(envPath)
 				assert.NoError(t, err, "Expected no error when loading config from .env")
@@ -56,6 +57,7 @@ func TestNewConfig(t *testing.T) {
 				// Assert the values loaded from .env
 				assert.Equal(t, "9090", cfg.API.Port, "API.Port should be loaded from .env")
 				assert.Equal(t, "production", cfg.API.Env, "API.Env should be loaded from .env")
+				assert.Equal(t, time.Duration(1)*time.Hour*myduration.HoursInDay*myduration.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TIMEALIVE should be loaded from system environment")
 
 				// Cleanup: Unset environment variables set by .env
 				t.Cleanup(func() {
@@ -72,6 +74,7 @@ func TestNewConfig(t *testing.T) {
 				// Set environment variables using t.Setenv for automatic cleanup
 				t.Setenv("API_PORT", "7070")
 				t.Setenv("API_ENV", "staging")
+				t.Setenv("API_TIMEALIVE", "1y")
 
 				// Load config without a .env file
 				cfg, err := config.New("")
@@ -80,6 +83,7 @@ func TestNewConfig(t *testing.T) {
 				// Assert the values loaded from system environment
 				assert.Equal(t, "7070", cfg.API.Port, "API.Port should be loaded from system environment")
 				assert.Equal(t, "staging", cfg.API.Env, "API.Env should be loaded from system environment")
+				assert.Equal(t, time.Duration(1)*time.Hour*myduration.HoursInDay*myduration.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TIMEALIVE should be loaded from system environment")
 			},
 		},
 		{

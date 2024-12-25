@@ -7,12 +7,16 @@ import (
 	"coupon_service/internal/service"
 	"fmt"
 	"log"
+	"os"
+	"syscall"
 	"time"
 )
 
-var (
-	repo = memdb.New()
-)
+var interruptSignals = []os.Signal{
+	os.Interrupt,
+	syscall.SIGTERM,
+	syscall.SIGINT,
+}
 
 func main() {
 	cfg, err := config.New()
@@ -20,9 +24,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	repo := memdb.New()
 	svc := service.New(repo)
 
 	server := api.New(cfg.API, svc)
+
 	server.Start()
 	fmt.Println("Starting Coupon service server")
 	<-time.After(1 * time.Hour * 24 * 365)
