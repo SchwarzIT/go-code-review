@@ -51,7 +51,7 @@ func TestNewConfig(t *testing.T) {
 				envContent := "API_PORT=9090\nAPI_ENV=production\nAPI_TIME_ALIVE=1y\nAPI_TIMEALIVE=1y\n"
 				envPath := createTempEnvFile(t, envContent)
 				// Load the .env file
-				cfg, err := config.New(envPath)
+				cfg, err := config.NewDefault(envPath)
 				assert.NoError(t, err, "Expected no error when loading config from .env")
 
 				// Assert the values loaded from .env
@@ -77,7 +77,7 @@ func TestNewConfig(t *testing.T) {
 				t.Setenv("API_TIMEALIVE", "1y")
 
 				// Load config without a .env file
-				cfg, err := config.New("")
+				cfg, err := config.NewDefault("")
 				assert.NoError(t, err, "Expected no error when loading config from system environment")
 
 				// Assert the values loaded from system environment
@@ -101,7 +101,7 @@ func TestNewConfig(t *testing.T) {
 				// Note: Not setting API_ENV to ensure it comes from .env
 
 				// Load the .env file with overrides
-				cfg, err := config.New(envPath)
+				cfg, err := config.NewDefault(envPath)
 				assert.NoError(t, err, "Expected no error when loading config with override")
 
 				// Assert that API_PORT is overridden and API_ENV comes from .env
@@ -119,7 +119,7 @@ func TestNewConfig(t *testing.T) {
 				t.Setenv("API_ENV", "test")
 
 				// Attempt to load config without API_PORT
-				cfg, err := config.New("")
+				cfg, err := config.NewDefault("")
 				assert.Error(t, err, "Expected error due to missing API_PORT")
 				assert.Contains(t, err.Error(), "critical environment variable API_PORT is missing", "Error message should indicate missing API_PORT")
 				assert.Empty(t, cfg.API.Port, "API.Port should be empty when missing")
@@ -136,7 +136,7 @@ func TestNewConfig(t *testing.T) {
 				// Do not set API_ENV to use default
 
 				// Load config without a .env file
-				cfg, err := config.New()
+				cfg, err := config.NewDefault("")
 				assert.NoError(t, err, "Expected no error when loading config with default values")
 
 				// Assert that API_ENV uses the default value
@@ -155,7 +155,7 @@ func TestNewConfig(t *testing.T) {
 				t.Setenv("API_ENV", "qa")
 
 				// Load config without a .env file
-				cfg, err := config.New("")
+				cfg, err := config.NewDefault("")
 				assert.NoError(t, err, "Expected no error when .env is missing but variables are set via system environment")
 
 				// Assert that values are loaded from system environment

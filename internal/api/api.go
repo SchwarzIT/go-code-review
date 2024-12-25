@@ -5,9 +5,7 @@ import (
 	"coupon_service/internal/myduration"
 	"coupon_service/internal/service/entity"
 	"fmt"
-	"log"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,9 +17,10 @@ type Service interface {
 }
 
 type Config struct {
-	Port      string                `env:"API_PORT"`
-	Env       string                `env:"API_ENV"`
-	TimeAlive myduration.MyDuration `env:"API_TIMEALIVE"`
+	Port            string                `env:"API_PORT"`
+	Env             string                `env:"API_ENV"`
+	TimeAlive       myduration.MyDuration `env:"API_TIMEALIVE"`
+	ShutdownTimeout myduration.MyDuration `env:"API_SHUTDOWNTIMEOUT"`
 }
 
 type API struct {
@@ -56,7 +55,7 @@ func (a API) withRoutes() API {
 	return a
 }
 
-func (a API) Start() (err error) {
+func (a *API) Start() (err error) {
 	err = a.srv.ListenAndServe()
 	if err != nil {
 		return
@@ -64,12 +63,6 @@ func (a API) Start() (err error) {
 	return
 }
 
-func (a API) Close() {
-	<-time.After(5 * time.Second)
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := a.srv.Shutdown(ctx); err != nil {
-		log.Println(err)
-	}
+func (a *API) Shutdown(ctx context.Context) error {
+	return a.srv.Shutdown(ctx)
 }
