@@ -46,8 +46,7 @@ func TestNewConfig(t *testing.T) {
 			test: func(t *testing.T) {
 				clearEnvVars(t)
 
-				envContent := "API_PORT=9090\nAPI_ENV=production\nAPI_TIME_ALIVE=2y\nAPI_AllOWORIGINS=https://example.com,https://api.example.com\nAPI_SHUTDOWN_TIMEOUT=20s"
-				t.Setenv("API_ALLOW_ORIGINS", "https://example.com,https://api.example.com")
+				envContent := "API_PORT=9090\nAPI_ENV=production\nAPI_TIME_ALIVE=2y\nAPI_ALLOW_ORIGINS=https://example.com,https://api.example.com\nAPI_SHUTDOWN_TIMEOUT=20s"
 				envPath := createTempEnvFile(t, envContent)
 				cfg, err := config.NewDefault(envPath)
 				assert.NoError(t, err, "Expected no error when loading config from .env")
