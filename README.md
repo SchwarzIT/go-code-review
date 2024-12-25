@@ -13,8 +13,8 @@ Configure the application using environment variables with support for a `.env` 
 - **`API_ENV`**
   - **Default:** `dev`
 - **`API_TIMEALIVE`**
-  - **Default:** `1y`
   - **Format:** Specify the duration using units like s (seconds), m (minutes), h (hours), d (days), w (weeks), or y (years). Example: 10d 10w 1y.
+  - **Without value:** API will run without duration
 
 ### `.env` File
 

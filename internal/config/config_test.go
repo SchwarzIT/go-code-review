@@ -48,7 +48,7 @@ func TestNewConfig(t *testing.T) {
 				clearEnvVars(t)
 
 				// Create a temporary .env file
-				envContent := "API_PORT=9090\nAPI_ENV=production\nAPI_TIME_ALIVE=1y\n"
+				envContent := "API_PORT=9090\nAPI_ENV=production\nAPI_TIME_ALIVE=1y\nAPI_TIMEALIVE=1y\n"
 				envPath := createTempEnvFile(t, envContent)
 				// Load the .env file
 				cfg, err := config.New(envPath)
@@ -57,6 +57,7 @@ func TestNewConfig(t *testing.T) {
 				// Assert the values loaded from .env
 				assert.Equal(t, "9090", cfg.API.Port, "API.Port should be loaded from .env")
 				assert.Equal(t, "production", cfg.API.Env, "API.Env should be loaded from .env")
+				assert.Equal(t, time.Duration(1)*time.Hour*myduration.HoursInDay*myduration.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TIMEALIVE should be loaded from system environment")
 
 				// Cleanup: Unset environment variables set by .env
 				t.Cleanup(func() {
