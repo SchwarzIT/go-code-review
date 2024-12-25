@@ -46,14 +46,17 @@ func TestNewConfig(t *testing.T) {
 			test: func(t *testing.T) {
 				clearEnvVars(t)
 
-				envContent := "API_PORT=9090\nAPI_ENV=production\nAPI_TIME_ALIVE=1y\nAPI_TIMEALIVE=1y\n"
+				envContent := "API_PORT=9090\nAPI_ENV=production\nAPI_TIME_ALIVE=2y\nAPI_AllOWORIGINS=https://example.com,https://api.example.com\nAPI_SHUTDOWN_TIMEOUT=20s"
+				t.Setenv("API_ALLOW_ORIGINS", "https://example.com,https://api.example.com")
 				envPath := createTempEnvFile(t, envContent)
 				cfg, err := config.NewDefault(envPath)
 				assert.NoError(t, err, "Expected no error when loading config from .env")
 
 				assert.Equal(t, "9090", cfg.API.Port, "API.Port should be loaded from .env")
 				assert.Equal(t, mytypes.Production, cfg.API.Env, "API.Env should be loaded from .env")
-				assert.Equal(t, time.Duration(1)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TIMEALIVE should be loaded from system environment")
+				assert.Len(t, cfg.API.Allow_Origins, 2, "API.AllowOrigin should be loaded from .env")
+				assert.Equal(t, time.Duration(2)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.Time_Alive.ParseTimeDuration(), "API.Time_Alive should be loaded from system environment")
+				assert.Equal(t, time.Duration(20)*time.Second, cfg.API.Shutdown_Timeout.ParseTimeDuration(), "API.Time_Alive should be loaded from system environment")
 
 				t.Cleanup(func() {
 					clearEnvVars(t)
@@ -67,14 +70,14 @@ func TestNewConfig(t *testing.T) {
 
 				t.Setenv("API_PORT", "7070")
 				t.Setenv("API_ENV", "development")
-				t.Setenv("API_TIMEALIVE", "1y")
+				t.Setenv("API_TIME_ALIVE", "1y")
 
 				cfg, err := config.NewDefault("")
 				assert.NoError(t, err, "Expected no error when loading config from system environment")
 
 				assert.Equal(t, "7070", cfg.API.Port, "API.Port should be loaded from system environment")
 				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should be loaded from system environment")
-				assert.Equal(t, time.Duration(1)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TIMEALIVE should be loaded from system environment")
+				assert.Equal(t, time.Duration(1)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.Time_Alive.ParseTimeDuration(), "API.Time_Alive should be loaded from system environment")
 			},
 		},
 		{

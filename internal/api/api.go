@@ -21,10 +21,11 @@ type Service interface {
 }
 
 type Config struct {
-	Port            string              `env:"API_PORT"`
-	Env             mytypes.Environment `env:"API_ENV"`
-	TimeAlive       mytypes.MyDuration  `env:"API_TIMEALIVE"`
-	ShutdownTimeout mytypes.MyDuration  `env:"API_SHUTDOWNTIMEOUT"`
+	Port             string               `env:"API_PORT"`
+	Env              mytypes.Environment  `env:"API_ENV"`
+	Time_Alive       mytypes.MyDuration   `env:"API_TIME_ALIVE"`
+	Shutdown_Timeout mytypes.MyDuration   `env:"API_SHUTDOWN_TIMEOUT"`
+	Allow_Origins    mytypes.AllowOrigins `env:"API_ALLOW_ORIGINS"`
 }
 
 type API struct {
@@ -56,7 +57,7 @@ func New[T Service](cfg Config, svc T) (*API, error) {
 		}
 	}
 
-	r := initializeGinEngine(cfg.Env, logger)
+	r := initializeGinEngine(cfg, logger)
 	api := &API{
 		MUX: r,
 		CFG: cfg,
@@ -65,18 +66,18 @@ func New[T Service](cfg Config, svc T) (*API, error) {
 	return api.withServer().withRoutes(), nil
 }
 
-func initializeGinEngine(env mytypes.Environment, logger *zap.Logger) *gin.Engine {
+func initializeGinEngine(cfg Config, logger *zap.Logger) *gin.Engine {
 	var router *gin.Engine
 
-	if env == mytypes.Production {
+	if cfg.Env == mytypes.Production {
 		router = gin.New()
 		router.Use(ginLogger(logger), gin.Recovery())
 		router.Use(cors.New(cors.Config{
-			AllowOrigins:     []string{"http://localhost"},
+			AllowOrigins:     cfg.Allow_Origins,
 			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
 			AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 			AllowCredentials: true,
-			MaxAge:           time.Duration(10) * time.Second,
+			MaxAge:           time.Duration(300) * time.Second,
 		}))
 	} else {
 		router = gin.Default()
