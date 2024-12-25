@@ -126,6 +126,24 @@ func TestNewConfig(t *testing.T) {
 			},
 		},
 		{
+			name: "InvalidEnvironment",
+			test: func(t *testing.T) {
+				// Clear environment variables
+				clearEnvVars(t)
+
+				// Set invalid API_ENV
+				t.Setenv("API_ENV", "matheus")
+
+				// Set environment variables that should override .env
+				t.Setenv("API_PORT", "6060")
+
+				// Attempt to load config without API_PORT
+				_, err := config.NewDefault("")
+				assert.Error(t, err, "Expected error due to missing API_PORT")
+				assert.Contains(t, err.Error(), "invalid environment provided, defaulting to development", "Error message should indicate invalid ENV")
+			},
+		},
+		{
 			name: "DefaultValues",
 			test: func(t *testing.T) {
 				// Clear environment variables

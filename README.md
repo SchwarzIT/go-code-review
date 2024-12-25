@@ -12,8 +12,8 @@ Configure the application using environment variables with support for a `.env` 
   - **Explanation:** API port
   - **required**
 - **`API_ENV`**
-  - **Explanation:** Type of environment "dev"|"prod"
-  - **Default:** `dev`
+  - **Explanation:** Type of environment "development"|"production"
+  - **Default:** `development`
 - **`API_TIMEALIVE`**
   - **Explanation:** Time max to server keep alive
   - **Format:** Specify the duration using units like s (seconds), m (minutes), h (hours), d (days), w (weeks), or y (years). Example: 10d 10w 1y.
