@@ -48,7 +48,7 @@ func (a *API) Get(c *gin.Context) {
 
 	coupons, err := a.svc.GetCoupons(codeList)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve coupons"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "failed not found coupons"})
 		return
 	}
 	c.JSON(http.StatusOK, coupons)

@@ -55,7 +55,7 @@ func BenchmarkEnvironment_UnmarshalText(b *testing.B) {
 		"DeVeLoPmEnT",
 		"PRODUCTION",
 		"  production  ",
-		"staging1", // Invalid input
+		"staging1",
 	}
 
 	for _, input := range inputs {
