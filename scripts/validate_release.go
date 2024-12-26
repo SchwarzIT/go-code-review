@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/pelletier/go-toml"
 )
+
+const releaseFile = "./release.toml"
 
 type Release struct {
 	Metadata struct {
@@ -32,15 +33,8 @@ type Section struct {
 	Description string `toml:"Description"`
 }
 
-func validateRelease(filePath string) error {
-
-	cleanedPath := filepath.Clean(filePath)
-	baseDir := "./"
-	if !strings.HasPrefix(cleanedPath, baseDir) {
-		return fmt.Errorf("file path is not allowed: %s", cleanedPath)
-	}
-
-	content, err := os.ReadFile(cleanedPath)
+func validateRelease() error {
+	content, err := os.ReadFile(releaseFile)
 	if err != nil {
 		return fmt.Errorf("failed to read file: %v", err)
 	}
@@ -90,15 +84,14 @@ func validateRelease(filePath string) error {
 }
 
 func main() {
-	releaseFile := "./release.toml"
-
 	fmt.Println("Checking if release file exists")
 	if _, err := os.Stat(releaseFile); os.IsNotExist(err) {
 		fmt.Println("release.toml file not found")
 		os.Exit(1)
 	}
+
 	fmt.Println("Validating release file")
-	err := validateRelease(releaseFile)
+	err := validateRelease()
 	if err != nil {
 		fmt.Printf("Validation failed: %v\n", err)
 		os.Exit(1)
