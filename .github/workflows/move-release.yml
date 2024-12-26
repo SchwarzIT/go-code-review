@@ -1,23 +1,61 @@
-name: Move release file into releases folder
+name: Release and Tag Management
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      increment_type:
+        description: 'Version increment type'
+        required: false
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
 
 permissions:
   contents: write
 
+concurrency:
+  group: release-tag-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  move_release_file:
+  manage_release:
     runs-on: ubuntu-latest
+
     steps:
+      # 1. Check out the repository with full history to access tags
       - name: Check out repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: true # Allows push back to the repo
+          persist-credentials: true
+          fetch-depth: 0 # Fetch all history to access tags
 
-      - name: Set up environment variables (timestamp, file paths)
+      # 1.b Exit if commit is made by GitHub Actions bot
+      - name: Exit if commit is made by GitHub Actions bot
+        if: ${{ github.actor == 'github-actions[bot]' }}
+        run: |
+          echo "Commit made by GitHub Actions bot. Exiting workflow."
+          exit 0
+      # 1.a Capture the triggering commit message
+      - name: Capture triggering commit message
+        id: capture_commit
+        run: |
+          # Get the commit message of the event that triggered the workflow
+          if [ "${{ github.event_name }}" == "push" ]; then
+            COMMIT_MESSAGE=$(git log -1 ${{ github.sha }} --pretty=%B)
+          elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            COMMIT_MESSAGE=""
+          fi
+          echo "COMMIT_MESSAGE<<EOF" >> $GITHUB_ENV
+          echo "$COMMIT_MESSAGE" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      # 2. Set up environment variables (timestamp, file paths)
+      - name: Set up environment variables
         id: setvars
         run: |
           TIMESTAMP=$(date +'%Y%m%d%H%M%S')
@@ -25,30 +63,139 @@ jobs:
           echo "RELEASE_SOURCE_FILE=release.toml" >> $GITHUB_ENV
           echo "RELEASE_FOLDER=releases" >> $GITHUB_ENV
           echo "RELEASE_TARGET_FILE=release_${TIMESTAMP}.toml" >> $GITHUB_ENV
-
-      - name: Move file to releases folder
+      # 3. Move the release file to the releases folder
+      - name: Move release file
         run: |
           echo "Using TIMESTAMP=$TIMESTAMP"
-          echo "Copying $RELEASE_SOURCE_FILE to $RELEASE_FOLDER/$RELEASE_TARGET_FILE"
+          echo "Moving $RELEASE_SOURCE_FILE to $RELEASE_FOLDER/$RELEASE_TARGET_FILE"
           mkdir -p "$RELEASE_FOLDER"
           mv "$RELEASE_SOURCE_FILE" "$RELEASE_FOLDER/$RELEASE_TARGET_FILE"
-
-      - name: Commit and push changes
+      # 4. Commit and push the changes
+      - name: Commit changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Remove old file from Git (if it was already tracked)
+          # Remove old release file from tracking
           git rm --cached "$RELEASE_SOURCE_FILE" || true
-
-
           git add "$RELEASE_FOLDER/$RELEASE_TARGET_FILE"
-
-          git commit -m "Add new release file $RELEASE_TARGET_FILE"
+          git commit -m "Release: Add $RELEASE_TARGET_FILE"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # So we can use $TIMESTAMP, $RELEASE_FOLDER, and $RELEASE_TARGET_FILE again
           TIMESTAMP: ${{ env.TIMESTAMP }}
           RELEASE_FOLDER: ${{ env.RELEASE_FOLDER }}
           RELEASE_TARGET_FILE: ${{ env.RELEASE_TARGET_FILE }}
+
+      # 5. Get the latest tag
+      - name: Get latest tag
+        id: get_latest_tag
+        run: |
+          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1` || echo "")
+          echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_OUTPUT
+      # 6. Validate the latest tag format
+      - name: Validate latest tag
+        if: steps.get_latest_tag.outputs.LATEST_TAG != ''
+        run: |
+          echo "${{ steps.get_latest_tag.outputs.LATEST_TAG }}" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' || { echo "Invalid tag format"; exit 1; }
+      # 7. Determine version increment
+      - name: Determine version increment
+        id: version_type
+        run: |
+          # If workflow_dispatch input is provided, use it; otherwise, use the captured commit message
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.increment_type }}" ]; then
+            INCREMENT="${{ github.event.inputs.increment_type }}"
+          else
+            # Use the captured commit message to determine increment
+            if echo "$COMMIT_MESSAGE" | grep -q '#major'; then
+              INCREMENT="major"
+            elif echo "$COMMIT_MESSAGE" | grep -q '#minor'; then
+              INCREMENT="minor"
+            else
+              INCREMENT="patch"
+            fi
+          fi
+          echo "INCREMENT=${INCREMENT}" >> $GITHUB_ENV
+        env:
+          COMMIT_MESSAGE: ${{ env.COMMIT_MESSAGE }}
+
+      # 8. Extract the current version number without the 'v' prefix
+      - name: Extract version number
+        id: extract_version
+        run: |
+          if [ -z "${{ steps.get_latest_tag.outputs.LATEST_TAG }}" ]; then
+            VERSION_NUMBER="0.0.0"
+          else
+            VERSION_TAG="${{ steps.get_latest_tag.outputs.LATEST_TAG }}"
+            VERSION_NUMBER="${VERSION_TAG#v}"
+          fi
+          echo "VERSION_NUMBER=${VERSION_NUMBER}" >> $GITHUB_ENV
+      # 9. Increment the version based on the determined type
+      - name: Increment version
+        id: increment_version
+        run: |
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION_NUMBER"
+          case "${INCREMENT}" in
+            major)
+              NEW_VERSION="v$((MAJOR + 1)).0.0"
+              ;;
+            minor)
+              NEW_VERSION="v$MAJOR.$((MINOR + 1)).0"
+              ;;
+            patch)
+              NEW_VERSION="v$MAJOR.$MINOR.$((PATCH + 1))"
+              ;;
+            *)
+              echo "Unknown increment type: ${INCREMENT}"
+              exit 1
+              ;;
+          esac
+          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+      # 10. Create and push the new tag
+      - name: Create and push tag
+        run: |
+          git tag -a "${NEW_VERSION}" -m "Release ${NEW_VERSION}: Move release file into releases folder"
+          git push origin "${NEW_VERSION}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_VERSION: ${{ env.NEW_VERSION }}
+
+      # 11. Build and push Docker image to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: matheuspolitano/couponservice:${{ env.NEW_VERSION }}
+
+      # 12. Create GitHub Release for the new tag
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.NEW_VERSION }}
+          release_name: Release ${{ env.NEW_VERSION }}
+          body: |
+            ## Changes
+            - Move release file into releases folder.
+            - Docker image updated to version `${{ env.NEW_VERSION }}`.
+          draft: false
+          prerelease: false
+
+      # 13. Upload the release file as an asset to the GitHub Release
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ env.RELEASE_FOLDER }}/${{ env.RELEASE_TARGET_FILE }}
+          asset_name: ${{ env.RELEASE_TARGET_FILE }}
+          asset_content_type: application/octet-stream
