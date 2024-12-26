@@ -36,16 +36,16 @@ func main() {
 	serverErrors := make(chan error, 1)
 
 	go func() {
-		log.Printf("Starting Coupon service server on port %s", cfg.API.Port)
+		log.Printf("Starting Coupon service server on port %s", cfg.API.PORT)
 		serverErrors <- server.Start()
 	}()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, interruptSignals...)
 
-	waitForShutdown(serverErrors, quit, cfg.API.Time_Alive.ParseTimeDuration())
+	waitForShutdown(serverErrors, quit, cfg.API.TIME_ALIVE.ParseTimeDuration())
 
-	ctx, cancel := context.WithTimeout(context.Background(), cfg.API.Shutdown_Timeout.ParseTimeDuration())
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.API.SHUTDOWN_TIMEOUT.ParseTimeDuration())
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
@@ -54,14 +54,15 @@ func main() {
 
 }
 
-func waitForShutdown(serverErrors <-chan error, quit <-chan os.Signal, Time_Alive time.Duration) {
-	if Time_Alive > 0 {
+func waitForShutdown(serverErrors <-chan error, quit <-chan os.Signal, TIME_ALIVE time.Duration) {
+	if TIME_ALIVE > 0 {
+		log.Printf("Server alive until %v", time.Now().Add(TIME_ALIVE))
 		select {
 		case err := <-serverErrors:
 			log.Panicf("Could not start server: %v", err)
 		case sig := <-quit:
 			log.Printf("Received signal %s. Initiating graceful shutdown...", sig)
-		case <-time.After(Time_Alive):
+		case <-time.After(TIME_ALIVE):
 			log.Printf("Timeout reached. Initiating graceful shutdown...")
 		}
 	} else {

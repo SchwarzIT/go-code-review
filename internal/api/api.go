@@ -23,25 +23,25 @@ type Service interface {
 // Config store main api settings
 // *Fields are with camel case to be read by the godotenv
 type Config struct {
-	Port             string               `env:"API_PORT"`
-	Env              mytypes.Environment  `env:"API_ENV"`
-	Time_Alive       mytypes.MyDuration   `env:"API_TIME_ALIVE"`
-	Shutdown_Timeout mytypes.MyDuration   `env:"API_SHUTDOWN_TIMEOUT"`
-	Allow_Origins    mytypes.AllowOrigins `env:"API_ALLOW_ORIGINS"`
+	PORT             string               `env:"API_PORT"`
+	ENV              mytypes.Environment  `env:"API_ENV"`
+	TIME_ALIVE       mytypes.MyDuration   `env:"API_TIME_ALIVE"`
+	SHUTDOWN_TIMEOUT mytypes.MyDuration   `env:"API_SHUTDOWN_TIMEOUT"`
+	ALLOW_ORIGINS    mytypes.AllowOrigins `env:"API_ALLOW_ORIGINS"`
 }
 
 type API struct {
 	srv *http.Server
-	MUX *gin.Engine
+	mux *gin.Engine
 	svc Service
-	CFG Config
+	cfg Config
 }
 
 func New[T Service](cfg Config, svc T) (*API, error) {
 	var logger *zap.Logger
 	var err error
 
-	if cfg.Env == mytypes.Production {
+	if cfg.ENV == mytypes.Production {
 		log.Println("Running in production mode")
 		gin.SetMode(gin.ReleaseMode)
 
@@ -61,8 +61,8 @@ func New[T Service](cfg Config, svc T) (*API, error) {
 
 	r := initializeGinEngine(cfg, logger)
 	api := &API{
-		MUX: r,
-		CFG: cfg,
+		mux: r,
+		cfg: cfg,
 		svc: svc,
 	}
 	return api.withServer().withRoutes(), nil
@@ -71,11 +71,11 @@ func New[T Service](cfg Config, svc T) (*API, error) {
 func initializeGinEngine(cfg Config, logger *zap.Logger) *gin.Engine {
 	var router *gin.Engine
 
-	if cfg.Env == mytypes.Production {
+	if cfg.ENV == mytypes.Production {
 		router = gin.New()
 		router.Use(ginLogger(logger), gin.Recovery())
 		router.Use(cors.New(cors.Config{
-			AllowOrigins:     cfg.Allow_Origins,
+			AllowOrigins:     cfg.ALLOW_ORIGINS,
 			AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
 			AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 			AllowCredentials: true,
@@ -119,8 +119,8 @@ func ginLogger(logger *zap.Logger) gin.HandlerFunc {
 
 func (a *API) withServer() *API {
 	a.srv = &http.Server{
-		Addr:              fmt.Sprintf(":%s", a.CFG.Port),
-		Handler:           a.MUX,
+		Addr:              fmt.Sprintf(":%s", a.cfg.PORT),
+		Handler:           a.mux,
 		ReadHeaderTimeout: time.Duration(5) * time.Second,
 		ReadTimeout:       time.Duration(10) * time.Second,
 		WriteTimeout:      time.Duration(5) * time.Second,
@@ -130,7 +130,7 @@ func (a *API) withServer() *API {
 }
 
 func (a *API) withRoutes() *API {
-	apiGroup := a.MUX.Group("/api")
+	apiGroup := a.mux.Group("/api")
 	apiGroup.POST("/apply", a.Apply)
 	apiGroup.POST("/create", a.Create)
 	apiGroup.GET("/coupons", a.Get)

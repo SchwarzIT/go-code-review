@@ -41,7 +41,7 @@ func New(envFilePath string, opts ...OptionsConfigFunc) (Config, error) {
 		return cfg, fmt.Errorf("failed to load config: %w", err)
 	}
 
-	if cfg.API.Port == "" {
+	if cfg.API.PORT == "" {
 		return cfg, fmt.Errorf("critical environment variable API_PORT is missing")
 	}
 

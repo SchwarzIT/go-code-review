@@ -51,11 +51,11 @@ func TestNewConfig(t *testing.T) {
 				cfg, err := config.NewDefault(envPath)
 				assert.NoError(t, err, "Expected no error when loading config from .env")
 
-				assert.Equal(t, "9090", cfg.API.Port, "API.Port should be loaded from .env")
-				assert.Equal(t, mytypes.Production, cfg.API.Env, "API.Env should be loaded from .env")
-				assert.Len(t, cfg.API.Allow_Origins, 2, "API.AllowOrigin should be loaded from .env")
-				assert.Equal(t, time.Duration(2)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.Time_Alive.ParseTimeDuration(), "API.Time_Alive should be loaded from system environment")
-				assert.Equal(t, time.Duration(20)*time.Second, cfg.API.Shutdown_Timeout.ParseTimeDuration(), "API.Time_Alive should be loaded from system environment")
+				assert.Equal(t, "9090", cfg.API.PORT, "api.PORT should be loaded from .env")
+				assert.Equal(t, mytypes.Production, cfg.API.ENV, "api.ENV should be loaded from .env")
+				assert.Len(t, cfg.API.ALLOW_ORIGINS, 2, "API.AllowOrigin should be loaded from .env")
+				assert.Equal(t, time.Duration(2)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.TIME_ALIVE.ParseTimeDuration(), "API.TIME_ALIVE should be loaded from system environment")
+				assert.Equal(t, time.Duration(20)*time.Second, cfg.API.SHUTDOWN_TIMEOUT.ParseTimeDuration(), "API.TIME_ALIVE should be loaded from system environment")
 
 				t.Cleanup(func() {
 					clearEnvVars(t)
@@ -74,9 +74,9 @@ func TestNewConfig(t *testing.T) {
 				cfg, err := config.NewDefault("")
 				assert.NoError(t, err, "Expected no error when loading config from system environment")
 
-				assert.Equal(t, "7070", cfg.API.Port, "API.Port should be loaded from system environment")
-				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should be loaded from system environment")
-				assert.Equal(t, time.Duration(2)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.Time_Alive.ParseTimeDuration(), "API.Time_Alive should be loaded from system environment")
+				assert.Equal(t, "7070", cfg.API.PORT, "api.PORT should be loaded from system environment")
+				assert.Equal(t, mytypes.Development, cfg.API.ENV, "api.ENV should be loaded from system environment")
+				assert.Equal(t, time.Duration(2)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.TIME_ALIVE.ParseTimeDuration(), "API.TIME_ALIVE should be loaded from system environment")
 			},
 		},
 		{
@@ -92,8 +92,8 @@ func TestNewConfig(t *testing.T) {
 				cfg, err := config.NewDefault(envPath)
 				assert.NoError(t, err, "Expected no error when loading config with override")
 
-				assert.Equal(t, "6060", cfg.API.Port, "API.Port should be overridden by system environment")
-				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should be loaded from .env")
+				assert.Equal(t, "6060", cfg.API.PORT, "api.PORT should be overridden by system environment")
+				assert.Equal(t, mytypes.Development, cfg.API.ENV, "api.ENV should be loaded from .env")
 			},
 		},
 		{
@@ -106,7 +106,7 @@ func TestNewConfig(t *testing.T) {
 				cfg, err := config.NewDefault("")
 				assert.Error(t, err, "Expected error due to missing API_PORT")
 				assert.Contains(t, err.Error(), "critical environment variable API_PORT is missing", "Error message should indicate missing API_PORT")
-				assert.Empty(t, cfg.API.Port, "API.Port should be empty when missing")
+				assert.Empty(t, cfg.API.PORT, "api.PORT should be empty when missing")
 			},
 		},
 		{
@@ -133,8 +133,8 @@ func TestNewConfig(t *testing.T) {
 				cfg, err := config.NewDefault("")
 				assert.NoError(t, err, "Expected no error when loading config with default values")
 
-				assert.Equal(t, "5050", cfg.API.Port, "API.Port should be loaded from system environment")
-				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should use default value 'dev'")
+				assert.Equal(t, "5050", cfg.API.PORT, "api.PORT should be loaded from system environment")
+				assert.Equal(t, mytypes.Development, cfg.API.ENV, "api.ENV should use default value 'dev'")
 			},
 		},
 		{
@@ -149,8 +149,8 @@ func TestNewConfig(t *testing.T) {
 				cfg, err := config.NewDefault("")
 				assert.NoError(t, err, "Expected no error when .env is missing but variables are set via system environment")
 
-				assert.Equal(t, "4040", cfg.API.Port, "API.Port should be loaded from system environment")
-				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should be loaded from system environment")
+				assert.Equal(t, "4040", cfg.API.PORT, "api.PORT should be loaded from system environment")
+				assert.Equal(t, mytypes.Development, cfg.API.ENV, "api.ENV should be loaded from system environment")
 			},
 		},
 	}
