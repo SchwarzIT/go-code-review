@@ -54,8 +54,8 @@ func TestNewConfig(t *testing.T) {
 				assert.Equal(t, "9090", cfg.API.Port, "API.Port should be loaded from .env")
 				assert.Equal(t, mytypes.Production, cfg.API.Env, "API.Env should be loaded from .env")
 				assert.Len(t, cfg.API.Allow_Origins, 2, "API.AllowOrigin should be loaded from .env")
-				assert.Equal(t, time.Duration(2)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TimeAlive should be loaded from system environment")
-				assert.Equal(t, time.Duration(20)*time.Second, cfg.API.Shutdown_Timeout.ParseTimeDuration(), "API.TimeAlive should be loaded from system environment")
+				assert.Equal(t, time.Duration(2)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.Time_Alive.ParseTimeDuration(), "API.Time_Alive should be loaded from system environment")
+				assert.Equal(t, time.Duration(20)*time.Second, cfg.API.Shutdown_Timeout.ParseTimeDuration(), "API.Time_Alive should be loaded from system environment")
 
 				t.Cleanup(func() {
 					clearEnvVars(t)
@@ -76,7 +76,7 @@ func TestNewConfig(t *testing.T) {
 
 				assert.Equal(t, "7070", cfg.API.Port, "API.Port should be loaded from system environment")
 				assert.Equal(t, mytypes.Development, cfg.API.Env, "API.Env should be loaded from system environment")
-				assert.Equal(t, time.Duration(1)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.TimeAlive.ParseTimeDuration(), "API.TimeAlive should be loaded from system environment")
+				assert.Equal(t, time.Duration(2)*time.Hour*mytypes.HoursInDay*mytypes.DaysInYear, cfg.API.Time_Alive.ParseTimeDuration(), "API.Time_Alive should be loaded from system environment")
 			},
 		},
 		{

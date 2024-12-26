@@ -20,10 +20,12 @@ type Service interface {
 	GetCoupons([]string) ([]entity.Coupon, error)
 }
 
+// Config store main api settings
+// *Fields are with camel case to be read by the godotenv
 type Config struct {
 	Port             string               `env:"API_PORT"`
 	Env              mytypes.Environment  `env:"API_ENV"`
-	TimeAlive        mytypes.MyDuration   `env:"API_TIME_ALIVE"`
+	Time_Alive       mytypes.MyDuration   `env:"API_TIME_ALIVE"`
 	Shutdown_Timeout mytypes.MyDuration   `env:"API_SHUTDOWN_TIMEOUT"`
 	Allow_Origins    mytypes.AllowOrigins `env:"API_ALLOW_ORIGINS"`
 }
