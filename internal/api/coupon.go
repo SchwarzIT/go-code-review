@@ -31,7 +31,7 @@ func (a *API) Create(c *gin.Context) {
 	if err != nil {
 		SendError(c, "error to create coupon", err.Error(), http.StatusBadRequest)
 	}
-	SendSuccess(c, fmt.Sprintf("Coupon %d created successfully", id), nil)
+	SendSuccess(c, fmt.Sprintf("Coupon %s created successfully", id), nil)
 }
 
 func (a *API) Get(c *gin.Context) {
