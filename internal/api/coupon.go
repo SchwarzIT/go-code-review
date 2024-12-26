@@ -2,6 +2,7 @@ package api
 
 import (
 	. "coupon_service/internal/api/entity"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -28,10 +29,9 @@ func (a *API) Create(c *gin.Context) {
 	}
 	id, err := a.svc.CreateCoupon(apiReq.Discount, apiReq.Code, apiReq.MinBasketValue)
 	if err != nil {
-		return
+		SendError(c, "error to create coupon", err.Error(), http.StatusBadRequest)
 	}
-	c.Status(http.StatusOK)
-	c.Writer.Write([]byte(id))
+	SendSuccess(c, fmt.Sprintf("Coupon %d created successfully", id), nil)
 }
 
 func (a *API) Get(c *gin.Context) {
