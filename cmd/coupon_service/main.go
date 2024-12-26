@@ -28,7 +28,10 @@ func main() {
 	repo := memdb.New()
 	svc := service.New(repo)
 
-	server := api.New(cfg.API, svc)
+	server, err := api.New(cfg.API, svc)
+	if err != nil {
+		log.Fatalf("Failed to setup the server: %v", err)
+	}
 
 	serverErrors := make(chan error, 1)
 
@@ -40,9 +43,9 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, interruptSignals...)
 
-	waitForShutdown(serverErrors, quit, cfg.API.TimeAlive.ParseTimeDuration())
+	waitForShutdown(serverErrors, quit, cfg.API.Time_Alive.ParseTimeDuration())
 
-	ctx, cancel := context.WithTimeout(context.Background(), cfg.API.ShutdownTimeout.ParseTimeDuration())
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.API.Shutdown_Timeout.ParseTimeDuration())
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
@@ -51,14 +54,14 @@ func main() {
 
 }
 
-func waitForShutdown(serverErrors <-chan error, quit <-chan os.Signal, timeAlive time.Duration) {
-	if timeAlive > 0 {
+func waitForShutdown(serverErrors <-chan error, quit <-chan os.Signal, Time_Alive time.Duration) {
+	if Time_Alive > 0 {
 		select {
 		case err := <-serverErrors:
 			log.Panicf("Could not start server: %v", err)
 		case sig := <-quit:
 			log.Printf("Received signal %s. Initiating graceful shutdown...", sig)
-		case <-time.After(timeAlive):
+		case <-time.After(Time_Alive):
 			log.Printf("Timeout reached. Initiating graceful shutdown...")
 		}
 	} else {

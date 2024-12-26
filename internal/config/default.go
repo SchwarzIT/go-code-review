@@ -1,35 +1,35 @@
 package config
 
 import (
-	"coupon_service/internal/myduration"
+	"coupon_service/internal/mytypes"
 	"time"
 )
 
+type environment string
+
 const (
-	defaultEnvironment = "dev"
-	defaultTimeAlive   = time.Duration(1) * myduration.HoursInDay * myduration.DaysInYear
-	shutdownTimeout    = time.Duration(30) * time.Second
+	Shutdown_Timeout = time.Duration(30) * time.Second
 )
 
 // WithDefaultEnv Option func to setup the default environment
 func WithDefaultEnv(cfg *Config) error {
-	cfg.API.Env = defaultEnvironment
+	cfg.API.Env = mytypes.DefaultEnvironment
 	return nil
 }
 
-// WithDefaultShutdownTimeout Option func to setup the default shutdown timeout
-func WithDefaultShutdownTimeout(cfg *Config) error {
-	cfg.API.ShutdownTimeout = myduration.MyDuration(shutdownTimeout)
+// WithDefaultShutdown_Timeout Option func to setup the default shutdown timeout
+func WithDefaultShutdown_Timeout(cfg *Config) error {
+	cfg.API.Shutdown_Timeout = mytypes.MyDuration(Shutdown_Timeout)
 	return nil
 }
 
-// WithDefaultEnv Option func to setup the default time alive
-func WithDefaultTimeAlive(cfg *Config) error {
-	cfg.API.TimeAlive = myduration.MyDuration(defaultTimeAlive)
+// WithDefaultAllowOrigins Option func to setup the default allow origins
+func WithDefaultAllowOrigins(cfg *Config) error {
+	cfg.API.Allow_Origins = mytypes.DefaultAllowOrigins
 	return nil
 }
 
 // NewDefault setup all default option func to create a new Config
 func NewDefault(envFilePath string) (Config, error) {
-	return New(envFilePath, WithDefaultEnv, WithDefaultTimeAlive, WithDefaultShutdownTimeout)
+	return New(envFilePath, WithDefaultEnv, WithDefaultShutdown_Timeout, WithDefaultAllowOrigins)
 }

@@ -1,4 +1,4 @@
-package myduration
+package mytypes
 
 import (
 	"fmt"

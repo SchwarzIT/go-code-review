@@ -12,16 +12,20 @@ Configure the application using environment variables with support for a `.env` 
   - **Explanation:** API port
   - **required**
 - **`API_ENV`**
-  - **Explanation:** Type of environment "dev"|"prod"
-  - **Default:** `dev`
-- **`API_TIMEALIVE`**
+  - **Explanation:** Type of environment "development"|"production"
+  - **Default:** `development`
+- **`API_TIME_ALIVE`**
   - **Explanation:** Time max to server keep alive
   - **Format:** Specify the duration using units like s (seconds), m (minutes), h (hours), d (days), w (weeks), or y (years). Example: 10d 10w 1y.
   - **Without value:** API will run without duration
-- **`API_SHUTDOWNTIMEOUT`**
+- **`API_SHUTDOWN_TIMEOUT`**
   - **Explanation:** Time max to server wait the request finishing when is shutdown
   - **Format:** Specify the duration using units like s (seconds), m (minutes), h (hours), d (days), w (weeks), or y (years). Example: 10d 10w 1y.
   - **Default:** `30s`
+- **`API_ALLOW_ORIGINS`**
+  - **Explanation:** Allow origins by CORS. Is valid only is production environment
+  - **Format:** Specify the hostname divide by split `https://example.com,https://api.example.com`
+  - **Default:** List of empty
 
 ### `.env` File
 
@@ -30,8 +34,9 @@ Create a `.env` file in the project root to set default values:
 ```dotenv
 API_PORT=9090
 API_ENV=production
-API_TIMEALIVE=1y
-API_SHUTDOWNTIMEOUT=60s
+API_TIME_ALIVE=1y
+API_SHUTDOWN_TIMEOUT=60s`
+API_ALLOW_ORIGINS=https://example.com,https://api.example.com
 ```
 
 ### Precedence
