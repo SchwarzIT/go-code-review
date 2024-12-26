@@ -1,0 +1,18 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Remove the release file from the root dir
+"""
+
+
+[[Digest.Bugs]]
+Name = "bug: Remove the file"
+Issue = 3
+Description = """
+The release file is root directory after was moved to release folders, fixing that
+"""

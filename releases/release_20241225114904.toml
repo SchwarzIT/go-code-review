@@ -1,0 +1,20 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Improve the method to setup the time alive
+"""
+
+
+[[Digest.Improvements]]
+Name = "7-improve-time-alive"
+Issue = 7
+Description = """
+Add the time alive as configuration
+"""
+
+
