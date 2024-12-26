@@ -25,7 +25,7 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	repo := memdb.New()
+	repo := memdb.NewRepository()
 	svc := service.New(repo)
 
 	server, err := api.New(cfg.API, svc)
