@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/pelletier/go-toml"
@@ -32,7 +33,14 @@ type Section struct {
 }
 
 func validateRelease(filePath string) error {
-	content, err := os.ReadFile(filePath)
+
+	cleanedPath := filepath.Clean(filePath)
+	baseDir := "./"
+	if !strings.HasPrefix(cleanedPath, baseDir) {
+		return fmt.Errorf("file path is not allowed: %s", cleanedPath)
+	}
+
+	content, err := os.ReadFile(cleanedPath)
 	if err != nil {
 		return fmt.Errorf("failed to read file: %v", err)
 	}
