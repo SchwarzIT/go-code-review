@@ -15,7 +15,7 @@ add new features to api
 Name = "7-improve-gin-api"
 Issue = 7
 Description = """
-Implement production and development environment and introduce allow origins
+Implement production and development environment and introduce allow origins and response functions
 """
 
 
