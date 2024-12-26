@@ -43,7 +43,7 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, interruptSignals...)
 
-	waitForShutdown(serverErrors, quit, cfg.API.Time_Alive.ParseTimeDuration())
+	waitForShutdown(serverErrors, quit, cfg.API.TimeAlive.ParseTimeDuration())
 
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.API.Shutdown_Timeout.ParseTimeDuration())
 	defer cancel()
@@ -54,14 +54,14 @@ func main() {
 
 }
 
-func waitForShutdown(serverErrors <-chan error, quit <-chan os.Signal, Time_Alive time.Duration) {
-	if Time_Alive > 0 {
+func waitForShutdown(serverErrors <-chan error, quit <-chan os.Signal, TimeAlive time.Duration) {
+	if TimeAlive > 0 {
 		select {
 		case err := <-serverErrors:
 			log.Panicf("Could not start server: %v", err)
 		case sig := <-quit:
 			log.Printf("Received signal %s. Initiating graceful shutdown...", sig)
-		case <-time.After(Time_Alive):
+		case <-time.After(TimeAlive):
 			log.Printf("Timeout reached. Initiating graceful shutdown...")
 		}
 	} else {

@@ -37,34 +37,28 @@ func validateRelease(filePath string) error {
 		return fmt.Errorf("failed to read file: %v", err)
 	}
 
-	// Basic format check
 	if !strings.HasPrefix(string(content), "[Metadata]") {
 		return fmt.Errorf("file must start with [Metadata] section")
 	}
 
-	// Parse TOML
 	var release Release
 	err = toml.Unmarshal(content, &release)
 	if err != nil {
 		return fmt.Errorf("invalid TOML format: %v", err)
 	}
 
-	// Check required fields in Metadata
 	if release.Metadata.Author == "" || release.Metadata.ReleaseFileVersion == "" {
 		return fmt.Errorf("missing required fields in Metadata")
 	}
 
-	// Check Notes in Description
 	if release.Description.Notes == "" {
 		return fmt.Errorf("Notes in Description must not be empty")
 	}
 
-	// Check Digest sections
 	if len(release.Digest.Features) == 0 && len(release.Digest.Improvements) == 0 && len(release.Digest.Bugs) == 0 {
 		return fmt.Errorf("at least one Digest section (Features, Improvements, Bugs) must be provided")
 	}
 
-	// Ensure every entry in Digest has required fields
 	validateSection := func(sections []Section) error {
 		for _, section := range sections {
 			if section.Name == "" || section.Issue == 0 || section.Description == "" {
@@ -89,15 +83,12 @@ func validateRelease(filePath string) error {
 
 func main() {
 	releaseFile := "./release.toml"
-	// Check if file exists
 
 	fmt.Println("Checking if release file exists")
 	if _, err := os.Stat(releaseFile); os.IsNotExist(err) {
 		fmt.Println("release.toml file not found")
 		os.Exit(1)
 	}
-
-	// Validate file
 	fmt.Println("Validating release file")
 	err := validateRelease(releaseFile)
 	if err != nil {

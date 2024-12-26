@@ -23,7 +23,7 @@ type Service interface {
 type Config struct {
 	Port             string               `env:"API_PORT"`
 	Env              mytypes.Environment  `env:"API_ENV"`
-	Time_Alive       mytypes.MyDuration   `env:"API_TIME_ALIVE"`
+	TimeAlive        mytypes.MyDuration   `env:"API_TIME_ALIVE"`
 	Shutdown_Timeout mytypes.MyDuration   `env:"API_SHUTDOWN_TIMEOUT"`
 	Allow_Origins    mytypes.AllowOrigins `env:"API_ALLOW_ORIGINS"`
 }
@@ -117,8 +117,12 @@ func ginLogger(logger *zap.Logger) gin.HandlerFunc {
 
 func (a *API) withServer() *API {
 	a.srv = &http.Server{
-		Addr:    fmt.Sprintf(":%s", a.CFG.Port),
-		Handler: a.MUX,
+		Addr:              fmt.Sprintf(":%s", a.CFG.Port),
+		Handler:           a.MUX,
+		ReadHeaderTimeout: time.Duration(5) * time.Second,
+		ReadTimeout:       time.Duration(10) * time.Second,
+		WriteTimeout:      time.Duration(5) * time.Second,
+		IdleTimeout:       time.Duration(10) * time.Second,
 	}
 	return a
 }
