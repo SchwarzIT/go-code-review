@@ -1,0 +1,18 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Improve the pipeline
+"""
+
+
+[[Digest.Bugs]]
+Name = "Improve the pipeline"
+Issue = 2
+Description = """
+This we will mv the file instead just copy to release folder
+"""

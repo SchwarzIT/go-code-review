@@ -1,0 +1,20 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+improve approach to start the server
+"""
+
+
+
+[[Digest.Improvements]]
+Name = "6-improve-main.go"
+Issue = 6
+Description = """
+Make adjust in main file, adding a grace shutdown and other best practices to manage the server
+"""
+
