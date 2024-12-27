@@ -16,14 +16,33 @@ This repository was created from the repository at https://github.com/SchwarzIT/
 - **Body:**
   ```json
   {
-    "code": "NEWCODE",
+    "code": "COUPON123",
     "discount": 10,
     "min_basket_value": 100
   }
   ```
 - **Responses:**
-  - **201:** Created coupon (`memdb.Coupon`)
-  - **400/500:** Error message
+  - **201:** Created coupon
+  ```json
+  {
+    "status": "success",
+    "message": "coupon 2e55fbb6-a856-4d25-9432-ce8f745bb118 created successfully",
+    "data": {
+      "id": "2e55fbb6-a856-4d25-9432-ce8f745bb118",
+      "code": "COUPON123",
+      "discount": 10,
+      "min_basket_value": 100
+    }
+  }
+  ```
+  - **400/500:**
+  ```json
+  {
+    "status": "error",
+    "message": "error to create coupon",
+    "error": "coupon code already used for another coupon"
+  }
+  ```
 - **Errors:**
   - If `discount` <= 0 or `min_basket_value` < 0, an error is returned.
   - If discount > `min_basket_value`, an error is returned.
