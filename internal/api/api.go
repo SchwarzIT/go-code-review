@@ -3,21 +3,26 @@ package api
 import (
 	"context"
 	"coupon_service/internal/mytypes"
-	"coupon_service/internal/service/entity"
+	"coupon_service/internal/repository/memdb"
+	"coupon_service/internal/service"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
+	_ "coupon_service/docs" // Import your Swagger docs so they are registered
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
 )
 
 type Service interface {
-	ApplyCoupon(*entity.Basket, string) error
-	CreateCoupon(discount int, code string, minBasketValue int) (*entity.Coupon, error)
-	GetCoupons([]string) ([]*entity.Coupon, error)
+	ApplyCoupon(*service.Basket, string) error
+	CreateCoupon(discount int, code string, minBasketValue int) (*memdb.Coupon, error)
+	GetCoupons([]string) ([]*memdb.Coupon, error)
 }
 
 // Config store main api settings
@@ -37,6 +42,12 @@ type API struct {
 	cfg Config
 }
 
+// New initializes a new API instance.
+//
+// @title        Coupon Service
+// @version      1.0
+// @description  This service handles coupon creation, retrieval, and application.
+// @BasePath  /api
 func New(cfg Config, svc Service) (*API, error) {
 	var logger *zap.Logger
 	var err error
@@ -130,7 +141,11 @@ func (a *API) withServer() *API {
 }
 
 func (a *API) withRoutes() *API {
-	apiGroup := a.mux.Group("/api")
+	apiGroup := a.mux.Group("/api") // Conditionally mount Swagger only in development or staging:
+	if a.cfg.ENV != mytypes.Production {
+		a.mux.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
+
 	apiGroup.POST("/apply", a.Apply)
 	apiGroup.POST("/create", a.Create)
 	apiGroup.GET("/coupons", a.Get)

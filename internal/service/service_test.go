@@ -2,7 +2,6 @@ package service
 
 import (
 	"coupon_service/internal/repository/memdb"
-	. "coupon_service/internal/service/entity"
 	"fmt"
 	"strings"
 	"testing"

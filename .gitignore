@@ -96,3 +96,12 @@ docs/generated/
 
 # Ignore personal test file
 test2.go
+
+
+# Ignore auto-generated Swagger files
+docs/swagger.json
+docs/swagger.yaml
+
+# If you generate additional Swagger files/folders
+docs/swagger_files/
+docs/*.lock

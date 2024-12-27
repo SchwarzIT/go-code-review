@@ -41,6 +41,7 @@ jobs:
         run: |
           echo "Commit made by GitHub Actions bot. Exiting workflow."
           exit 0
+
       # 1.a Capture the triggering commit message
       - name: Capture triggering commit message
         id: capture_commit
@@ -54,6 +55,7 @@ jobs:
           echo "COMMIT_MESSAGE<<EOF" >> $GITHUB_ENV
           echo "$COMMIT_MESSAGE" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+
       # 2. Set up environment variables (timestamp, file paths)
       - name: Set up environment variables
         id: setvars
@@ -63,6 +65,7 @@ jobs:
           echo "RELEASE_SOURCE_FILE=release.toml" >> $GITHUB_ENV
           echo "RELEASE_FOLDER=releases" >> $GITHUB_ENV
           echo "RELEASE_TARGET_FILE=release_${TIMESTAMP}.toml" >> $GITHUB_ENV
+
       # 3. Move the release file to the releases folder
       - name: Move release file
         run: |
@@ -70,6 +73,7 @@ jobs:
           echo "Moving $RELEASE_SOURCE_FILE to $RELEASE_FOLDER/$RELEASE_TARGET_FILE"
           mkdir -p "$RELEASE_FOLDER"
           mv "$RELEASE_SOURCE_FILE" "$RELEASE_FOLDER/$RELEASE_TARGET_FILE"
+
       # 4. Commit and push the changes
       - name: Commit changes
         run: |
@@ -86,18 +90,31 @@ jobs:
           RELEASE_FOLDER: ${{ env.RELEASE_FOLDER }}
           RELEASE_TARGET_FILE: ${{ env.RELEASE_TARGET_FILE }}
 
-      # 5. Get the latest tag
+      # 5. Generate Swagger Docs
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20' # or whichever version you need
+
+      - name: Install swag and generate docs
+        run: |
+          go install github.com/swaggo/swag/cmd/swag@latest
+          swag init --parseDependency --parseInternal -g ./internal/api/api.go -o ./docs
+
+      # 6. Get the latest tag
       - name: Get latest tag
         id: get_latest_tag
         run: |
           LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1` || echo "")
           echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_OUTPUT
-      # 6. Validate the latest tag format
+
+      # 7. Validate the latest tag format
       - name: Validate latest tag
         if: steps.get_latest_tag.outputs.LATEST_TAG != ''
         run: |
           echo "${{ steps.get_latest_tag.outputs.LATEST_TAG }}" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' || { echo "Invalid tag format"; exit 1; }
-      # 7. Determine version increment
+
+      # 8. Determine version increment
       - name: Determine version increment
         id: version_type
         run: |
@@ -118,7 +135,7 @@ jobs:
         env:
           COMMIT_MESSAGE: ${{ env.COMMIT_MESSAGE }}
 
-      # 8. Extract the current version number without the 'v' prefix
+      # 9. Extract the current version number without the 'v' prefix
       - name: Extract version number
         id: extract_version
         run: |
@@ -129,7 +146,8 @@ jobs:
             VERSION_NUMBER="${VERSION_TAG#v}"
           fi
           echo "VERSION_NUMBER=${VERSION_NUMBER}" >> $GITHUB_ENV
-      # 9. Increment the version based on the determined type
+
+      # 10. Increment the version based on the determined type
       - name: Increment version
         id: increment_version
         run: |
@@ -150,7 +168,8 @@ jobs:
               ;;
           esac
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
-      # 10. Create and push the new tag
+
+      # 11. Create and push the new tag
       - name: Create and push tag
         run: |
           git tag -a "${NEW_VERSION}" -m "Release ${NEW_VERSION}: Move release file into releases folder"
@@ -159,7 +178,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NEW_VERSION: ${{ env.NEW_VERSION }}
 
-      # 11. Build and push Docker image to Docker Hub
+      # 12. Build and push Docker image to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -171,9 +190,11 @@ jobs:
         with:
           context: .
           push: true
-          tags: matheuspolitano/couponservice:${{ env.NEW_VERSION }}
+          tags: |
+            matheuspolitano/couponservice:${{ env.NEW_VERSION }}
+            matheuspolitano/couponservice:latest
 
-      # 12. Create GitHub Release for the new tag
+      # 13. Create GitHub Release for the new tag
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
@@ -189,7 +210,7 @@ jobs:
           draft: false
           prerelease: false
 
-      # 13. Upload the release file as an asset to the GitHub Release
+      # 14. Upload the release file as an asset to the GitHub Release
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:

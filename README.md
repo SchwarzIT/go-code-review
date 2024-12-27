@@ -2,6 +2,161 @@
 
 This repository was created from the repository at https://github.com/SchwarzIT/go-code-review to make corrections and improvements
 
+## Coupon Service (v1.0)
+
+**Base Path:** `/api`  
+**Description:** Handles coupon creation, retrieval, and application.
+
+---
+
+#### 1. Create Coupon
+
+- **Purpose:** Creates a new coupon, validating that the discount is positive and does not exceed the minimum basket value.
+- **Endpoint:** `POST /create`
+- **Body:**
+  ```json
+  {
+    "code": "COUPON123",
+    "discount": 10,
+    "min_basket_value": 100
+  }
+  ```
+- **Responses:**
+
+  - **201:** Created coupon
+
+  ```json
+  {
+    "status": "success",
+    "message": "coupon 2e55fbb6-a856-4d25-9432-ce8f745bb118 created successfully",
+    "data": {
+      "id": "2e55fbb6-a856-4d25-9432-ce8f745bb118",
+      "code": "COUPON123",
+      "discount": 10,
+      "min_basket_value": 100
+    }
+  }
+  ```
+
+  - **400:** Example of one of the bad response
+
+  ```json
+  {
+    "status": "error",
+    "message": "error to create coupon",
+    "error": "coupon code already used for another coupon"
+  }
+  ```
+
+  - **Errors:**
+  - If `discount` <= 0 or `min_basket_value` < 0, an error is returned.
+  - If discount > `min_basket_value`, an error is returned.
+  - If a coupon with the same code already exists, an error is returned.
+
+---
+
+#### 2. Apply Coupon
+
+- **Purpose:** Applies a coupon to the given basket, ensuring the basket value and coupon criteria are valid
+- **Endpoint:** `POST /apply`
+- **Body:**
+  ```json
+  {
+    "basket": { "Value": 100 },
+    "code": "COUPON123"
+  }
+  ```
+- **Responses:**
+
+  - **200:**
+
+  ```json
+  {
+    "status": "success",
+    "message": "coupon applied successfully",
+    "data": {
+      "Value": 100,
+      "applied_discount": 10,
+      "application_successful": true
+    }
+  }
+  ```
+
+  - **400:** Example of one of the bad response
+
+  ```json
+  {
+    "status": "error",
+    "message": "error to apply the coupon",
+    "error": "cannot apply discount: value 80 did not reach the minimum 100"
+  }
+  ```
+
+  - **Errors:**
+  - If coupon does not exist, an error is returned.
+  - If `basket.value` <= 0, an error is returned.
+  - If `basket.value` less than coupon `min_basket_value`
+
+#### 3. Get Coupons by Code
+
+- **Purpose:** Retrieves multiple coupons by their codes.
+- **Endpoint:** `GET /coupons?codes=COUPON12,COUPON123`
+- **Query Param:** `codes` (comma-separated, e.g. `CODE1,CODE2`)
+- **Responses:**
+
+  - **200:**
+
+  ```json
+  {
+    "status": "success",
+    "message": "found all coupons",
+    "data": [
+      {
+        "id": "2e55fbb6-a856-4d25-9432-ce8f745bb118",
+        "code": "COUPON123",
+        "discount": 10,
+        "min_basket_value": 100
+      }
+    ]
+  }
+  ```
+
+  - **404:** Example of one of the bad response
+    ```json
+    {
+      "status": "error",
+      "message": "error to found all coupons",
+      "error": "one or more errors occurred: [coupon code: COUPON000, err: coupon not found]"
+    }
+    ```
+
+- **Errors:**
+
+  - If one or more coupons do not exist, errors are aggregated and returned alongside any successful lookups.
+  - If missing query string codes
+
+### Data Models
+
+- **`service.Basket`**
+  ```json
+  {
+    "Value": 100
+  }
+  ```
+- **`memdb.Coupon`**
+  ```json
+  {
+    "id": "UUID",
+    "code": "XYZ",
+    "discount": 10,
+    "min_basket_value": 100
+  }
+  ```
+
+## Swagger Documentation
+
+During development mode, you can access the automatically generated Swagger documentation by navigating to swagger/index.html. This provides a convenient way to explore and test the API endpoints while you’re actively developing the service.
+
 ## 📦 Configuration
 
 Configure the application using environment variables with support for a `.env` file and default values.
