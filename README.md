@@ -9,31 +9,9 @@ This repository was created from the repository at https://github.com/SchwarzIT/
 
 ---
 
-#### 1. Apply Coupon
+#### 1. Create Coupon
 
-- **Endpoint:** `POST /apply`
-- **Body:**
-  ```json
-  {
-    "basket": { "Value": 100 },
-    "code": "COUPON123"
-  }
-  ```
-- **Responses:**
-  - **200:** Updated basket (`service.Basket`)
-  - **400/500:** Error message
-
-#### 2. Get Coupons by Code
-
-- **Endpoint:** `GET /coupons`
-- **Query Param:** `codes` (comma-separated, e.g. `CODE1,CODE2`)
-- **Responses:**
-  - **200:** Array of coupons (`memdb.Coupon`)
-  - **400/404:** Error message
-
-#### 3. Create Coupon
-
-- **Purpose** Creates a new coupon, validating that the discount is positive and does not exceed the minimum basket value.
+- **Purpose:** Creates a new coupon, validating that the discount is positive and does not exceed the minimum basket value.
 - **Endpoint:** `POST /create`
 - **Body:**
   ```json
@@ -52,6 +30,37 @@ This repository was created from the repository at https://github.com/SchwarzIT/
   - If a coupon with the same code already exists, an error is returned.
 
 ---
+
+#### 2. Apply Coupon
+
+- **Purpose:** Applies a coupon to the given basket, ensuring the basket value and coupon criteria are valid
+- **Endpoint:** `POST /apply`
+- **Body:**
+  ```json
+  {
+    "basket": { "Value": 100 },
+    "code": "COUPON123"
+  }
+  ```
+- **Responses:**
+  - **200:** Updated basket (`service.Basket`)
+  - **400/500:** Error message
+- **Errors:**
+  - If coupon does not exist, an error is returned.
+  - If basket.Value <= 0, an error is returned.
+  - If basket.Value < coupon.MinBasketValue, an error is returned.
+
+#### 3. Get Coupons by Code
+
+- **Purpose:** Retrieves multiple coupons by their codes.
+- **Endpoint:** `GET /coupons`
+- **Query Param:** `codes` (comma-separated, e.g. `CODE1,CODE2`)
+- **Responses:**
+  - **200:** Array of coupons (`memdb.Coupon`)
+  - **400/404:** Error message
+- **Errors:**
+  - If one or more coupons do not exist, errors are aggregated and returned alongside any successful lookups.
+  - If missing query string codes
 
 ### Data Models
 
