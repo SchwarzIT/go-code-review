@@ -47,13 +47,13 @@ This repository was created from the repository at https://github.com/SchwarzIT/
   - **400/500:** Error message
 - **Errors:**
   - If coupon does not exist, an error is returned.
-  - If basket.Value <= 0, an error is returned.
-  - If basket.Value < coupon.MinBasketValue, an error is returned.
+  - If `basket.value` <= 0, an error is returned.
+  - If `basket.value` less than coupon `min_basket_value`
 
 #### 3. Get Coupons by Code
 
 - **Purpose:** Retrieves multiple coupons by their codes.
-- **Endpoint:** `GET /coupons`
+- **Endpoint:** `GET /coupons?codes=COUPON12,COUPON123`
 - **Query Param:** `codes` (comma-separated, e.g. `CODE1,CODE2`)
 - **Responses:**
   - **200:** Array of coupons (`memdb.Coupon`)
