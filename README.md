@@ -33,6 +33,7 @@ This repository was created from the repository at https://github.com/SchwarzIT/
 
 #### 3. Create Coupon
 
+- **Purpose** Creates a new coupon, validating that the discount is positive and does not exceed the minimum basket value.
 - **Endpoint:** `POST /create`
 - **Body:**
   ```json
@@ -45,6 +46,10 @@ This repository was created from the repository at https://github.com/SchwarzIT/
 - **Responses:**
   - **201:** Created coupon (`memdb.Coupon`)
   - **400/500:** Error message
+- **Errors:**
+  - If `discount` <= 0 or `min_basket_value` < 0, an error is returned.
+  - If discount > `min_basket_value`, an error is returned.
+  - If a coupon with the same code already exists, an error is returned.
 
 ---
 
