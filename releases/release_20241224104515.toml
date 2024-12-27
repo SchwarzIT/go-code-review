@@ -1,0 +1,18 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+This is the first Merge request
+"""
+
+
+[[Digest.Bugs]]
+Name = "Fix main bugs"
+Issue = 1
+Description = """
+
+"""

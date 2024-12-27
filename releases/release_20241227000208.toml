@@ -1,0 +1,21 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+This will create image and setup the pipeline to update the dockerhub
+"""
+
+
+[[Digest.Improvements]]
+Name = "9-setup-docker"
+Issue = 9
+Description = """
+Implement ci/cd with image and add docker compose
+"""
+
+
+

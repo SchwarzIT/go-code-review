@@ -1,0 +1,21 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Improve memdb to prevent future issues
+"""
+
+
+
+[[Digest.Improvements]]
+Name = "8-improve-memdb"
+Issue = 8
+Description = """
+Add extra methods, improve the Concurrency, add extra Validation and Immutability
+"""
+
+
