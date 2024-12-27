@@ -2,6 +2,74 @@
 
 This repository was created from the repository at https://github.com/SchwarzIT/go-code-review to make corrections and improvements
 
+## Coupon Service (v1.0)
+
+**Base Path:** `/api`  
+**Description:** Handles coupon creation, retrieval, and application.
+
+---
+
+#### 1. Apply Coupon
+
+- **Endpoint:** `POST /apply`
+- **Body:**
+  ```json
+  {
+    "basket": { "Value": 100 },
+    "code": "COUPON123"
+  }
+  ```
+- **Responses:**
+  - **200:** Updated basket (`service.Basket`)
+  - **400/500:** Error message
+
+#### 2. Get Coupons by Code
+
+- **Endpoint:** `GET /coupons`
+- **Query Param:** `codes` (comma-separated, e.g. `CODE1,CODE2`)
+- **Responses:**
+  - **200:** Array of coupons (`memdb.Coupon`)
+  - **400/404:** Error message
+
+#### 3. Create Coupon
+
+- **Endpoint:** `POST /create`
+- **Body:**
+  ```json
+  {
+    "code": "NEWCODE",
+    "discount": 10,
+    "min_basket_value": 100
+  }
+  ```
+- **Responses:**
+  - **201:** Created coupon (`memdb.Coupon`)
+  - **400/500:** Error message
+
+---
+
+### Data Models
+
+- **`service.Basket`**
+  ```json
+  {
+    "Value": 100
+  }
+  ```
+- **`memdb.Coupon`**
+  ```json
+  {
+    "id": "UUID",
+    "code": "XYZ",
+    "discount": 10,
+    "min_basket_value": 100
+  }
+  ```
+
+## Swagger Documentation
+
+During development mode, you can access the automatically generated Swagger documentation by navigating to swagger/index.html. This provides a convenient way to explore and test the API endpoints while you’re actively developing the service.
+
 ## 📦 Configuration
 
 Configure the application using environment variables with support for a `.env` file and default values.

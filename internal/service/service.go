@@ -1,7 +1,7 @@
 package service
 
 import (
-	. "coupon_service/internal/service/entity"
+	"coupon_service/internal/repository/memdb"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -9,8 +9,8 @@ import (
 
 // Repository interface to memdb repository
 type Repository interface {
-	FindByCode(string) (*Coupon, error)
-	Save(*Coupon) error
+	FindByCode(string) (*memdb.Coupon, error)
+	Save(*memdb.Coupon) error
 }
 
 // Service manage application features
@@ -53,7 +53,7 @@ func (s *Service) ApplyCoupon(basket *Basket, code string) error {
 // CreateCoupon a new coupon
 // It returns an error if discount not be a positive number and minBasketValue cant not be negative
 // It returns an error if discount be higher that min basket
-func (s *Service) CreateCoupon(discount int, code string, minBasketValue int) (*Coupon, error) {
+func (s *Service) CreateCoupon(discount int, code string, minBasketValue int) (*memdb.Coupon, error) {
 	if discount <= 0 {
 		return nil, ErrCouponDiscountValue
 	}
@@ -70,7 +70,7 @@ func (s *Service) CreateCoupon(discount int, code string, minBasketValue int) (*
 		return nil, ErrCouponCodeAlreadyExist
 	}
 
-	coupon := &Coupon{
+	coupon := &memdb.Coupon{
 		ID:             uuid.NewString(),
 		Code:           code,
 		Discount:       discount,
@@ -85,8 +85,8 @@ func (s *Service) CreateCoupon(discount int, code string, minBasketValue int) (*
 
 // GetCoupons return a list of coupons based on the codes provided
 // It returns an error if case one of the code does not exist will
-func (s *Service) GetCoupons(codes []string) ([]*Coupon, error) {
-	coupons := make([]*Coupon, 0, len(codes))
+func (s *Service) GetCoupons(codes []string) ([]*memdb.Coupon, error) {
+	coupons := make([]*memdb.Coupon, 0, len(codes))
 	var errs []error
 
 	for _, code := range codes {

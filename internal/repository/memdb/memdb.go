@@ -4,29 +4,34 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-
-	"coupon_service/internal/service/entity"
 )
+
+type Coupon struct {
+	ID             string `json:"id"`
+	Code           string `json:"code"`
+	Discount       int    `json:"discount"`
+	MinBasketValue int    `json:"min_basket_value"`
+}
 
 // Repository defines the in-memory storage for Coupons.
 // It implements the repository interface.
 type Repository struct {
-	entries map[string]*entity.Coupon
+	entries map[string]*Coupon
 	mu      sync.RWMutex
 }
 
 // NewRepository creates and returns a new Repository instance.
 func NewRepository() *Repository {
 	return &Repository{
-		entries: make(map[string]*entity.Coupon),
+		entries: make(map[string]*Coupon),
 	}
 }
 
 // RepositoryInterface defines the methods that the Repository implements.
 // Exported for external usage if needed.
 type RepositoryInterface interface {
-	FindByCode(string) (*entity.Coupon, error)
-	Save(*entity.Coupon) error
+	FindByCode(string) (*Coupon, error)
+	Save(*Coupon) error
 	Delete(string) error
 }
 
@@ -38,7 +43,7 @@ var (
 
 // FindByCode retrieves a Coupon by its code.
 // It returns a copy of the Coupon to prevent external modifications.
-func (r *Repository) FindByCode(code string) (*entity.Coupon, error) {
+func (r *Repository) FindByCode(code string) (*Coupon, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -54,7 +59,7 @@ func (r *Repository) FindByCode(code string) (*entity.Coupon, error) {
 
 // Save stores a Coupon in the repository.
 // It returns an error if the coupon is nil or has an empty code.
-func (r *Repository) Save(coupon *entity.Coupon) error {
+func (r *Repository) Save(coupon *Coupon) error {
 	if coupon == nil {
 		return ErrInvalidCoupon
 	}
