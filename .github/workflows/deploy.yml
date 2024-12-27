@@ -1,4 +1,4 @@
-name: Release and Tag Management
+name: Release, Tag Management and deploy DockerHub
 
 on:
   push:
