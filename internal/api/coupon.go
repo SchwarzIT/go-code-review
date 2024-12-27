@@ -50,7 +50,7 @@ func (a *API) Get(c *gin.Context) {
 
 	coupons, err := a.svc.GetCoupons(codeList)
 	if err != nil {
-		SendError(c, "error to retrieve all coupons", err.Error(), http.StatusBadRequest)
+		SendError(c, "error to found all coupons", err.Error(), http.StatusNotFound)
 		return
 	}
 	SendSuccess(c, "found all coupons", coupons)
