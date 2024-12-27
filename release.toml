@@ -1,0 +1,20 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Make adjust on the README
+"""
+
+
+[[Digest.Improvements]]
+Name = "14-update-readme"
+Issue = 14
+Description = """
+Make adjust on the README
+"""
+
+
