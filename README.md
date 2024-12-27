@@ -22,7 +22,9 @@ This repository was created from the repository at https://github.com/SchwarzIT/
   }
   ```
 - **Responses:**
+
   - **201:** Created coupon
+
   ```json
   {
     "status": "success",
@@ -35,7 +37,9 @@ This repository was created from the repository at https://github.com/SchwarzIT/
     }
   }
   ```
-  - **400/500:**
+
+  - **400:** Example of one of the bad response
+
   ```json
   {
     "status": "error",
@@ -43,7 +47,8 @@ This repository was created from the repository at https://github.com/SchwarzIT/
     "error": "coupon code already used for another coupon"
   }
   ```
-- **Errors:**
+
+  - **Errors:**
   - If `discount` <= 0 or `min_basket_value` < 0, an error is returned.
   - If discount > `min_basket_value`, an error is returned.
   - If a coupon with the same code already exists, an error is returned.
@@ -62,9 +67,32 @@ This repository was created from the repository at https://github.com/SchwarzIT/
   }
   ```
 - **Responses:**
-  - **200:** Updated basket (`service.Basket`)
-  - **400/500:** Error message
-- **Errors:**
+
+  - **200:**
+
+  ```json
+  {
+    "status": "success",
+    "message": "coupon applied successfully",
+    "data": {
+      "Value": 100,
+      "applied_discount": 10,
+      "application_successful": true
+    }
+  }
+  ```
+
+  - **400:** Example of one of the bad response
+
+  ```json
+  {
+    "status": "error",
+    "message": "error to apply the coupon",
+    "error": "cannot apply discount: value 80 did not reach the minimum 100"
+  }
+  ```
+
+  - **Errors:**
   - If coupon does not exist, an error is returned.
   - If `basket.value` <= 0, an error is returned.
   - If `basket.value` less than coupon `min_basket_value`
@@ -75,9 +103,35 @@ This repository was created from the repository at https://github.com/SchwarzIT/
 - **Endpoint:** `GET /coupons?codes=COUPON12,COUPON123`
 - **Query Param:** `codes` (comma-separated, e.g. `CODE1,CODE2`)
 - **Responses:**
-  - **200:** Array of coupons (`memdb.Coupon`)
-  - **400/404:** Error message
+
+  - **200:**
+
+  ```json
+  {
+    "status": "success",
+    "message": "found all coupons",
+    "data": [
+      {
+        "id": "2e55fbb6-a856-4d25-9432-ce8f745bb118",
+        "code": "COUPON123",
+        "discount": 10,
+        "min_basket_value": 100
+      }
+    ]
+  }
+  ```
+
+  - **404:** Example of one of the bad response
+    ```json
+    {
+      "status": "error",
+      "message": "error to found all coupons",
+      "error": "one or more errors occurred: [coupon code: COUPON000, err: coupon not found]"
+    }
+    ```
+
 - **Errors:**
+
   - If one or more coupons do not exist, errors are aggregated and returned alongside any successful lookups.
   - If missing query string codes
 
