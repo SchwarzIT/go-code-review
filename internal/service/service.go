@@ -7,65 +7,100 @@ import (
 	"github.com/google/uuid"
 )
 
+// Repository interface to memdb repository
 type Repository interface {
 	FindByCode(string) (*Coupon, error)
 	Save(*Coupon) error
 }
 
+// Service manage application features
 type Service struct {
 	repo Repository
 }
 
-func New(repo Repository) Service {
-	return Service{
+// New create a new Service
+func New(repo Repository) *Service {
+	return &Service{
 		repo: repo,
 	}
 }
 
-func (s Service) ApplyCoupon(basket Basket, code string) (b *Basket, e error) {
-	b = &basket
+// ApplyCoupon in the basket provided
+// It returns an error if code coupon not exist and basket value must be positive value
+func (s *Service) ApplyCoupon(basket *Basket, code string) error {
 	coupon, err := s.repo.FindByCode(code)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	if b.Value > 0 {
-		b.AppliedDiscount = coupon.Discount
-		b.ApplicationSuccessful = true
-	}
-	if b.Value == 0 {
-		return
+	if basket.Value <= 0 {
+		return ErrApplyDiscount
 	}
 
-	return nil, fmt.Errorf("Tried to apply discount to negative value")
+	if basket.Value < coupon.MinBasketValue {
+		return &ErrApplyDiscountLessMin{
+			MinValue: coupon.MinBasketValue,
+			Current:  basket.Value,
+		}
+	}
+
+	basket.AppliedDiscount = coupon.Discount
+	basket.ApplicationSuccessful = true
+
+	return nil
 }
 
-func (s Service) CreateCoupon(discount int, code string, minBasketValue int) (string, error) {
-	coupon := Coupon{
-		Discount:       discount,
-		Code:           code,
-		MinBasketValue: minBasketValue,
+// CreateCoupon a new coupon
+// It returns an error if discount not be a positive number and minBasketValue cant not be negative
+// It returns an error if discount be higher that min basket
+func (s *Service) CreateCoupon(discount int, code string, minBasketValue int) (*Coupon, error) {
+	if discount <= 0 {
+		return nil, ErrCouponDiscountValue
+	}
+
+	if minBasketValue < 0 {
+		return nil, ErrCouponMinBasketValue
+	}
+
+	if discount > minBasketValue {
+		return nil, ErrCouponDiscountTooBig
+	}
+
+	if _, err := s.repo.FindByCode(code); err == nil {
+		return nil, ErrCouponCodeAlreadyExist
+	}
+
+	coupon := &Coupon{
 		ID:             uuid.NewString(),
+		Code:           code,
+		Discount:       discount,
+		MinBasketValue: minBasketValue,
 	}
 
-	if err := s.repo.Save(&coupon); err != nil {
-		return "", err
+	if err := s.repo.Save(coupon); err != nil {
+		return nil, fmt.Errorf("failed to save coupon: %w", err)
 	}
-	return coupon.ID, nil
+	return coupon, nil
 }
 
-func (s Service) GetCoupons(codes []string) ([]Coupon, error) {
-	coupons := make([]Coupon, 0, len(codes))
-	var e error
+// GetCoupons return a list of coupons based on the codes provided
+// It returns an error if case one of the code does not exist will
+func (s *Service) GetCoupons(codes []string) ([]*Coupon, error) {
+	coupons := make([]*Coupon, 0, len(codes))
+	var errs []error
 
-	for idx, code := range codes {
+	for _, code := range codes {
 		coupon, err := s.repo.FindByCode(code)
 		if err != nil {
-			e = fmt.Errorf("code: %s, index: %d", code, idx)
+			errs = append(errs, fmt.Errorf("coupon code: %s, err: %s", code, err.Error()))
 			continue
 		}
-		coupons = append(coupons, *coupon)
+		coupons = append(coupons, coupon)
 	}
 
-	return coupons, e
+	if len(errs) > 0 {
+		return coupons, fmt.Errorf("one or more errors occurred: %v", errs)
+	}
+
+	return coupons, nil
 }

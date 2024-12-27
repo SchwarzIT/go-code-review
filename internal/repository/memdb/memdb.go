@@ -70,17 +70,3 @@ func (r *Repository) Save(coupon *entity.Coupon) error {
 	r.entries[coupon.Code] = &couponCopy
 	return nil
 }
-
-// Delete removes a Coupon from the repository by its code.
-// It returns an error if the coupon does not exist.
-func (r *Repository) Delete(code string) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	if _, exists := r.entries[code]; !exists {
-		return ErrCouponNotFound
-	}
-
-	delete(r.entries, code)
-	return nil
-}
