@@ -1,0 +1,68 @@
+name: Go Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Go Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Go environment
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22.4' # Updated Go version to match toolchain
+
+      # Step 3: Cache Go modules to speed up builds
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-1.22.4
+          restore-keys: |
+            ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}-
+            ${{ runner.os }}-go-
+            ${{ runner.os }}-
+
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        run: go mod tidy
+
+      # Optional Step: Verify Go Modules
+      - name: Verify Go Modules
+        run: go mod verify
+
+      # Optional Step: Run GoLint
+      - name: Run GoLint
+        run: |
+          go install golang.org/x/lint/golint@latest
+          golint ./...
+
+      # Optional Step: Run Static Analysis
+      - name: Run Static Analysis
+        run: |
+          go install github.com/securego/gosec/v2/cmd/gosec@latest
+          gosec ./...
+
+      # Step 5: Run tests with coverage
+      - name: Run Tests
+        run: |
+          go test -v ./... -coverprofile=coverage.out
+
+      # Step 6: Upload coverage results (optional)
+      - name: Upload Coverage
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage.out
