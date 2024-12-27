@@ -9,7 +9,7 @@ import (
 // AllowOrigins represents a list of allowed origins for CORS.
 type AllowOrigins []string
 
-var DefaultAllowOrigins = AllowOrigins{}
+var DefaultAllowOrigins = []string{"*"}
 
 // UnmarshalText implements the encoding.TextUnmarshaler interface.
 // It parses a comma-separated string into an AllowOrigins slice,

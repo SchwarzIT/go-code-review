@@ -1,4 +1,4 @@
-// File: mytypes/allow_origins_test.go
+// File: mytypes/ALLOW_ORIGINS_test.go
 package mytypes
 
 import (

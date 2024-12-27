@@ -9,7 +9,7 @@ FROM alpine:3.19
 WORKDIR /app
 COPY --from=builder /app/main .
 
-
-EXPOSE 8080 9090
+ENV API_PORT=80
+EXPOSE 80
 CMD [ "/app/main" ]
 

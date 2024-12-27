@@ -25,7 +25,7 @@ Configure the application using environment variables with support for a `.env` 
 - **`API_ALLOW_ORIGINS`**
   - **Explanation:** Allow origins by CORS. Is valid only is production environment
   - **Format:** Specify the hostname divide by split `https://example.com,https://api.example.com`
-  - **Default:** List of empty
+  - **Default:** Allow all origins
 
 ### `.env` File
 
