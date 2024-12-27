@@ -1,0 +1,19 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Remove the swag from the pipeline 
+"""
+
+
+
+[[Digest.Bugs]]
+Name = "13-fix-swag-bug-pipeline"
+Issue = 13
+Description = """
+Remove the swag from the pipeline 
+"""
