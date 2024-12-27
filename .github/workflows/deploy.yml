@@ -190,7 +190,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: matheuspolitano/couponservice:${{ env.NEW_VERSION }}
+          tags: |
+            matheuspolitano/couponservice:${{ env.NEW_VERSION }}
+            matheuspolitano/couponservice:latest
 
       # 13. Create GitHub Release for the new tag
       - name: Create GitHub Release
