@@ -1,9 +1,225 @@
-# Schwarz IT Code Review Repository
+# Overview
 
-This repository is meant to be used in the onboarding process of Go developers
-applying to Schwarz IT.
+This repository was created from the repository at https://github.com/SchwarzIT/go-code-review to make corrections and improvements
 
-Code smells and security issues are made on purpose. All the code to be reviewed is
-in the [review](review) directory.
+## Coupon Service (v1.0)
 
+**Base Path:** `/api`  
+**Description:** Handles coupon creation, retrieval, and application.
 
+---
+
+#### 1. Create Coupon
+
+- **Purpose:** Creates a new coupon, validating that the discount is positive and does not exceed the minimum basket value.
+- **Endpoint:** `POST /create`
+- **Body:**
+  ```json
+  {
+    "code": "COUPON123",
+    "discount": 10,
+    "min_basket_value": 100
+  }
+  ```
+- **Responses:**
+
+  - **201:** Created coupon
+
+  ```json
+  {
+    "status": "success",
+    "message": "coupon 2e55fbb6-a856-4d25-9432-ce8f745bb118 created successfully",
+    "data": {
+      "id": "2e55fbb6-a856-4d25-9432-ce8f745bb118",
+      "code": "COUPON123",
+      "discount": 10,
+      "min_basket_value": 100
+    }
+  }
+  ```
+
+  - **400:** Example of one of the bad response
+
+  ```json
+  {
+    "status": "error",
+    "message": "error to create coupon",
+    "error": "coupon code already used for another coupon"
+  }
+  ```
+
+  - **Errors:**
+  - If `discount` <= 0 or `min_basket_value` < 0, an error is returned.
+  - If discount > `min_basket_value`, an error is returned.
+  - If a coupon with the same code already exists, an error is returned.
+
+---
+
+#### 2. Apply Coupon
+
+- **Purpose:** Applies a coupon to the given basket, ensuring the basket value and coupon criteria are valid
+- **Endpoint:** `POST /apply`
+- **Body:**
+  ```json
+  {
+    "basket": { "Value": 100 },
+    "code": "COUPON123"
+  }
+  ```
+- **Responses:**
+
+  - **200:**
+
+  ```json
+  {
+    "status": "success",
+    "message": "coupon applied successfully",
+    "data": {
+      "Value": 100,
+      "applied_discount": 10,
+      "application_successful": true
+    }
+  }
+  ```
+
+  - **400:** Example of one of the bad response
+
+  ```json
+  {
+    "status": "error",
+    "message": "error to apply the coupon",
+    "error": "cannot apply discount: value 80 did not reach the minimum 100"
+  }
+  ```
+
+  - **Errors:**
+  - If coupon does not exist, an error is returned.
+  - If `basket.value` <= 0, an error is returned.
+  - If `basket.value` less than coupon `min_basket_value`
+
+#### 3. Get Coupons by Code
+
+- **Purpose:** Retrieves multiple coupons by their codes.
+- **Endpoint:** `GET /coupons?codes=COUPON12,COUPON123`
+- **Query Param:** `codes` (comma-separated, e.g. `CODE1,CODE2`)
+- **Responses:**
+
+  - **200:**
+
+  ```json
+  {
+    "status": "success",
+    "message": "found all coupons",
+    "data": [
+      {
+        "id": "2e55fbb6-a856-4d25-9432-ce8f745bb118",
+        "code": "COUPON123",
+        "discount": 10,
+        "min_basket_value": 100
+      }
+    ]
+  }
+  ```
+
+  - **404:** Example of one of the bad response
+    ```json
+    {
+      "status": "error",
+      "message": "error to found all coupons",
+      "error": "one or more errors occurred: [coupon code: COUPON000, err: coupon not found]"
+    }
+    ```
+
+- **Errors:**
+
+  - If one or more coupons do not exist, errors are aggregated and returned alongside any successful lookups.
+  - If missing query string codes
+
+### Data Models
+
+- **`service.Basket`**
+  ```json
+  {
+    "Value": 100
+  }
+  ```
+- **`memdb.Coupon`**
+  ```json
+  {
+    "id": "UUID",
+    "code": "XYZ",
+    "discount": 10,
+    "min_basket_value": 100
+  }
+  ```
+
+## Swagger Documentation
+
+During development mode, you can access the automatically generated Swagger documentation by navigating to swagger/index.html. This provides a convenient way to explore and test the API endpoints while you’re actively developing the service.
+
+## 📦 Configuration
+
+Configure the application using environment variables with support for a `.env` file and default values.
+
+### Environment Variables
+
+- **`API_PORT`**
+  - **Explanation:** API port
+  - **required**
+- **`API_ENV`**
+  - **Explanation:** Type of environment "development"|"production"
+  - **Default:** `development`
+- **`API_TIME_ALIVE`**
+  - **Explanation:** Time max to server keep alive
+  - **Format:** Specify the duration using units like s (seconds), m (minutes), h (hours), d (days), w (weeks), or y (years). Example: 10d 10w 1y.
+  - **Without value:** API will run without duration
+- **`API_SHUTDOWN_TIMEOUT`**
+  - **Explanation:** Time max to server wait the request finishing when is shutdown
+  - **Format:** Specify the duration using units like s (seconds), m (minutes), h (hours), d (days), w (weeks), or y (years). Example: 10d 10w 1y.
+  - **Default:** `30s`
+- **`API_ALLOW_ORIGINS`**
+  - **Explanation:** Allow origins by CORS. Is valid only is production environment
+  - **Format:** Specify the hostname divide by split `https://example.com,https://api.example.com`
+  - **Default:** Allow all origins
+
+### `.env` File
+
+Create a `.env` file in the project root to set default values:
+
+```dotenv
+API_PORT=9090
+API_ENV=production
+API_TIME_ALIVE=1y
+API_SHUTDOWN_TIMEOUT=60s`
+API_ALLOW_ORIGINS=https://example.com,https://api.example.com
+```
+
+### Precedence
+
+1. **System Environment Variables** override `.env` values.
+2. **`.env` File** provides defaults.
+3. **Struct Defaults** apply if neither is set.
+
+**Example:**
+
+- `.env` has `API_PORT=9090`
+- System sets `API_PORT=7070`
+- **Effective `API_PORT`:** `7070`
+
+## 📄 Releases
+
+The releases folder is used to store version-specific metadata for project updates, such as features, improvements, and bug fixes. Each release file is structured using the standard template located at ./templates/release.toml.
+
+Workflow Automation
+The repository includes a CI/CD pipeline to validate and manage release files:
+
+1. Validation:
+   When a pull request is opened or updated, the pipeline validates the release.toml file using the script `scripts/validate_release.go` to ensure it follows the required structure.
+2. Merge Handling:
+   When a pull request is merged, the pipeline automatically moves the validated `release.toml` file into the releases folder, renaming it with a timestamp for unique identification.
+
+### How to Add a New Release:
+
+1. Use the provided template at `./templates/release.toml` to create a new release file.
+2. Ensure the file is added to your pull request and follows the required structure.
+3. Upon merging, the CI/CD pipeline will handle validation and placement in the releases folder.
