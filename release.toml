@@ -1,0 +1,20 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Implement improvements in the service package
+"""
+
+
+[[Digest.Improvements]]
+Name = "11-improve-service"
+Issue = 11
+Description = """
+Fix code bugs, logic problems and improve performance of service 
+"""
+
+
