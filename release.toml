@@ -1,0 +1,19 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+fix bug with apply endpoint
+"""
+
+
+
+[[Digest.Bugs]]
+Name = "15-fix-apply-body"
+Issue = 16
+Description = """
+When has error in bind the json not return the error
+"""

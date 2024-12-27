@@ -35,6 +35,7 @@ type CouponRequest struct {
 func (a *API) Apply(c *gin.Context) {
 	apiReq := ApplicationRequest{}
 	if err := c.ShouldBindJSON(&apiReq); err != nil {
+		SendError(c, "error to read the body", err.Error(), http.StatusBadRequest)
 		return
 	}
 	err := a.svc.ApplyCoupon(&apiReq.Basket, apiReq.Code)
