@@ -15,9 +15,9 @@ import (
 )
 
 type Service interface {
-	ApplyCoupon(entity.Basket, string) (*entity.Basket, error)
-	CreateCoupon(int, string, int) (string, error)
-	GetCoupons([]string) ([]entity.Coupon, error)
+	ApplyCoupon(*entity.Basket, string) error
+	CreateCoupon(discount int, code string, minBasketValue int) (*entity.Coupon, error)
+	GetCoupons([]string) ([]*entity.Coupon, error)
 }
 
 // Config store main api settings
@@ -37,7 +37,7 @@ type API struct {
 	cfg Config
 }
 
-func New[T Service](cfg Config, svc T) (*API, error) {
+func New(cfg Config, svc Service) (*API, error) {
 	var logger *zap.Logger
 	var err error
 

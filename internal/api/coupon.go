@@ -14,42 +14,44 @@ func (a *API) Apply(c *gin.Context) {
 	if err := c.ShouldBindJSON(&apiReq); err != nil {
 		return
 	}
-	basket, err := a.svc.ApplyCoupon(apiReq.Basket, apiReq.Code)
+	err := a.svc.ApplyCoupon(&apiReq.Basket, apiReq.Code)
 	if err != nil {
+		SendError(c, "error to apply the coupon", err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	c.JSON(http.StatusOK, basket)
+	SendSuccess(c, "coupon applied successfully", apiReq.Basket)
 }
 
 func (a *API) Create(c *gin.Context) {
-	apiReq := Coupon{}
+	apiReq := CouponRequest{}
 	if err := c.ShouldBindJSON(&apiReq); err != nil {
+		SendError(c, "error to read the body", err.Error(), http.StatusBadRequest)
 		return
 	}
-	id, err := a.svc.CreateCoupon(apiReq.Discount, apiReq.Code, apiReq.MinBasketValue)
+	coupon, err := a.svc.CreateCoupon(apiReq.Discount, apiReq.Code, apiReq.MinBasketValue)
 	if err != nil {
 		SendError(c, "error to create coupon", err.Error(), http.StatusBadRequest)
+		return
 	}
-	SendSuccess(c, fmt.Sprintf("Coupon %s created successfully", id), nil)
+	SendSuccess(c, fmt.Sprintf("coupon %s created successfully", coupon.ID), coupon)
 }
 
 func (a *API) Get(c *gin.Context) {
 	codes := c.Query("codes")
 	if codes == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "query parameter 'codes' is required"})
+		SendError(c, "query parameter 'codes' is required", "", http.StatusBadRequest)
 		return
 	}
 	codeList := strings.Split(codes, ",")
 	if len(codeList) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "query parameter 'codes' cannot be empty"})
+		SendError(c, "query parameter 'codes' cannot be empty", "", http.StatusBadRequest)
 		return
 	}
 
 	coupons, err := a.svc.GetCoupons(codeList)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "failed not found coupons"})
+		SendError(c, "error to retrieve all coupons", err.Error(), http.StatusBadRequest)
 		return
 	}
-	c.JSON(http.StatusOK, coupons)
+	SendSuccess(c, "found all coupons", coupons)
 }

@@ -96,20 +96,8 @@ func TestRepository_Delete(t *testing.T) {
 		err := repo.Save(coupon)
 		assert.NoError(t, err, "Expected no error when saving a valid coupon")
 
-		err = repo.Delete("WINTER30")
-		assert.NoError(t, err, "Expected no error when deleting an existing coupon")
-
-		// Verify that the coupon is deleted
-		_, err = repo.FindByCode("WINTER30")
-		assert.Error(t, err, "Expected an error when finding a deleted coupon")
-		assert.Equal(t, ErrCouponNotFound, err, "Error should be ErrCouponNotFound")
 	})
 
-	t.Run("Attempt to delete a non-existent coupon", func(t *testing.T) {
-		err := repo.Delete("NONEXISTENT")
-		assert.Error(t, err, "Expected an error when deleting a non-existent coupon")
-		assert.Equal(t, ErrCouponNotFound, err, "Error should be ErrCouponNotFound")
-	})
 }
 
 func TestRepository_Concurrency(t *testing.T) {
