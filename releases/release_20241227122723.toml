@@ -1,0 +1,21 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Small adjust in github pipeline
+"""
+
+
+
+[[Digest.Improvements]]
+Name = "10-migrate-deploy-file"
+Issue = 10
+Description = """
+Migrate the file move_release to deploy to be more clear 
+"""
+
+
