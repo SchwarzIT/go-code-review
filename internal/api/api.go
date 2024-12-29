@@ -45,7 +45,7 @@ type API struct {
 // New initializes a new API instance.
 //
 // @title        Coupon Service
-// @version      1.0
+// @version      1.1
 // @description  This service handles coupon creation, retrieval, and application.
 // @BasePath  /api
 func New(cfg Config, svc Service) (*API, error) {

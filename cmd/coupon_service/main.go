@@ -25,7 +25,11 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	repo := memdb.NewRepository()
+	repo, err := memdb.NewRepositoryDefault()
+	if err != nil {
+		log.Fatalf("Failed to load the local repository: %v", err)
+	}
+
 	svc := service.New(repo)
 
 	server, err := api.New(cfg.API, svc)

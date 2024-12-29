@@ -34,6 +34,7 @@ This repository is a fork of the [go-code-review](https://github.com/SchwarzIT/g
 ## 🛠️ Features
 
 - **Coupon Creation:** Generate new coupons with validation.
+- **Persistent Coupons:** Coupons will be saved in `/app/data/coupons.data.json`in container to ensure persistence.
 - **Coupon Application:** Apply coupons to shopping baskets with validation.
 - **Bulk Retrieval:** Retrieve multiple coupons by their codes.
 - **Docker Support:** Easy deployment using Docker containers.
@@ -53,38 +54,41 @@ docker pull matheuspolitano/couponservice:latest
 #### 2. **Run the Docker Container**
 
 ```bash
-docker run -d --name couponservice -p 80:80 matheuspolitano/couponservice:latest
+docker run -d --name couponservice -p 80:80 -v ${PWD}/data:/app/data  matheuspolitano/couponservice:latest
 ```
 
 - **Port Configuration:** Replace `-p 80:80` with the desired host and container ports.
-- **Environment Variables & Volumes:** Add any necessary environment variables or volume mounts as needed.
+- **Volume Configuration:** Replace `${PWD}/data:/app/data ` with the path that you want store the coupons.
+- **Environment Variables & Volumes:** Add any necessary environment variables [🛠️ configuration](#-configuration) or volume mounts as needed.
 
 ### 🛠️ Installation
 
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/YourUsername/couponservice.git
+   git clone https://github.com/matheuspolitano/couponservice.git
    cd couponservice
    ```
 
 2. **Set Up Environment Variables**
 
-   Create a `.env` file in the project root:
+Creating a .env file in the project root is optional. Instead of using a `.env` file, you can set the necessary environment variables directly in your system. If both the environment variables and the `.env` file are present, the environment variables will take precedence.
 
-   ```dotenv
-   API_PORT=9090
-   API_ENV=production
-   API_TIME_ALIVE=1y
-   API_SHUTDOWN_TIMEOUT=60s
-   API_ALLOW_ORIGINS=https://example.com,https://api.example.com
-   ```
+For detailed instructions on how to set environment variables, please refer to the [🛠️ configuration](#-configuration) section
+
+```dotenv
+API_PORT=9090
+API_ENV=production
+API_TIME_ALIVE=1y
+API_SHUTDOWN_TIMEOUT=60s
+API_ALLOW_ORIGINS=https://example.com,https://api.example.com
+```
 
 3. **Build and Run**
 
    ```bash
-   docker build -t matheuspolitano/couponservice:latest .
-   docker run -d --name couponservice -p 80:80 matheuspolitano/couponservice:latest
+   docker build -t couponservice .
+   docker run -d --name couponservice -p 80:80 couponservice
    ```
 
 ## 🖥️ API Documentation
@@ -267,7 +271,7 @@ docker run -d --name couponservice -p 80:80 matheuspolitano/couponservice:latest
 
 ## 📜 Swagger Documentation
 
-During development, access the Swagger UI at `http://localhost:<API_PORT>/swagger/index.html` to explore and test the API endpoints interactively.
+During **development**, access the Swagger UI at `http://localhost:<API_PORT>/swagger/index.html` to explore and test the API endpoints interactively.
 
 ## 🛠️ Configuration
 

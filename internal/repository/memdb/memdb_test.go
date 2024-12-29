@@ -9,7 +9,7 @@ import (
 )
 
 func TestRepository_Save(t *testing.T) {
-	repo := NewRepository()
+	repo := SetupTestRepository(t)
 
 	t.Run("Save and retrieve a valid coupon", func(t *testing.T) {
 		coupon := Coupon{
@@ -52,14 +52,33 @@ func TestRepository_Save(t *testing.T) {
 		assert.NoError(t, err, "Expected to find the overwritten coupon")
 		assert.Equal(t, coupon2, storedCoupon, "Stored coupon should match the latest saved coupon")
 	})
+
+	t.Run("Save a coupon with empty code should fail", func(t *testing.T) {
+		coupon := Coupon{
+			ID:             "4",
+			Code:           "",
+			Discount:       15,
+			MinBasketValue: 75,
+		}
+
+		err := repo.Save(&coupon)
+		assert.Error(t, err, "Expected an error when saving a coupon with empty code")
+		assert.Equal(t, ErrInvalidCoupon.Error()+": coupon code is empty", err.Error(), "Error message should indicate empty coupon code")
+	})
+
+	t.Run("Save a nil coupon should fail", func(t *testing.T) {
+		err := repo.Save(nil)
+		assert.Error(t, err, "Expected an error when saving a nil coupon")
+		assert.Equal(t, ErrInvalidCoupon, err, "Error should be ErrInvalidCoupon")
+	})
 }
 
 func TestRepository_FindByCode(t *testing.T) {
-	repo := NewRepository()
+	repo := SetupTestRepository(t)
 
 	t.Run("Find existing coupon", func(t *testing.T) {
 		coupon := Coupon{
-			ID:             "4",
+			ID:             "5",
 			Code:           "SUMMER20",
 			Discount:       20,
 			MinBasketValue: 100,
@@ -80,26 +99,8 @@ func TestRepository_FindByCode(t *testing.T) {
 	})
 }
 
-func TestRepository_Delete(t *testing.T) {
-	repo := NewRepository()
-
-	t.Run("Delete existing coupon", func(t *testing.T) {
-		coupon := Coupon{
-			ID:             "5",
-			Code:           "WINTER30",
-			Discount:       30,
-			MinBasketValue: 150,
-		}
-
-		err := repo.Save(&coupon)
-		assert.NoError(t, err, "Expected no error when saving a valid coupon")
-
-	})
-
-}
-
 func TestRepository_Concurrency(t *testing.T) {
-	repo := NewRepository()
+	repo := SetupTestRepository(t)
 	var wg sync.WaitGroup
 	numGoroutines := 50
 	couponCodePrefix := "CONCUR_"
@@ -113,22 +114,31 @@ func TestRepository_Concurrency(t *testing.T) {
 				Discount:       i % 100,
 				MinBasketValue: i * 10,
 			}
-			repo.Save(coupon)
+			err := repo.Save(coupon)
+			if err != nil {
+				// It's generally not recommended to use assert within goroutines.
+				// Instead, you might want to log the error or handle it accordingly.
+				// For simplicity, we'll use t.Errorf here, but be aware of potential race conditions.
+				t.Errorf("Failed to save coupon %s: %v", coupon.Code, err)
+			}
 		}
 	}
 
 	findCoupons := func(start, end int) {
 		defer wg.Done()
 		for i := start; i < end; i++ {
-			repo.FindByCode(fmt.Sprintf("%s%d", couponCodePrefix, i))
+			_, _ = repo.FindByCode(fmt.Sprintf("%s%d", couponCodePrefix, i))
+			// Ignoring errors as some coupons might not have been saved yet.
 		}
 	}
 
+	// Launch goroutines to save coupons
 	for i := 0; i < numGoroutines; i++ {
 		wg.Add(1)
 		go saveCoupons(i*100, (i+1)*100)
 	}
 
+	// Launch goroutines to find coupons
 	for i := 0; i < numGoroutines; i++ {
 		wg.Add(1)
 		go findCoupons(i*100, (i+1)*100)
@@ -136,11 +146,15 @@ func TestRepository_Concurrency(t *testing.T) {
 
 	wg.Wait()
 
+	// Verify a few coupons to ensure they were saved correctly
 	for i := 0; i < numGoroutines*100; i += 1000 {
 		code := fmt.Sprintf("%s%d", couponCodePrefix, i)
 		coupon, err := repo.FindByCode(code)
-		if err == nil {
+		if assert.NoError(t, err, "Expected to find the coupon %s", code) {
 			assert.Equal(t, code, coupon.Code, "Coupon code should match")
+			assert.Equal(t, fmt.Sprintf("%d", i), coupon.ID, "Coupon ID should match")
+			assert.Equal(t, i%100, coupon.Discount, "Coupon discount should match")
+			assert.Equal(t, i*10, coupon.MinBasketValue, "Coupon min basket value should match")
 		}
 	}
 }

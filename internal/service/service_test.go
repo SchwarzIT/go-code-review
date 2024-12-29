@@ -10,7 +10,7 @@ import (
 )
 
 func TestService_CreateCoupon(t *testing.T) {
-	repo := memdb.NewRepository()
+	repo := memdb.SetupTestRepository(t)
 	sev := New(repo)
 	tests := []struct {
 		name  string
@@ -106,7 +106,7 @@ func TestService_CreateCoupon(t *testing.T) {
 }
 
 func TestService_GetCoupons(t *testing.T) {
-	repo := memdb.NewRepository()
+	repo := memdb.SetupTestRepository(t)
 	svc := New(repo)
 
 	coupon, err := svc.CreateCoupon(20, "AA1", 100)
@@ -154,7 +154,7 @@ func TestService_GetCoupons(t *testing.T) {
 }
 
 func TestService_ApplyCoupon(t *testing.T) {
-	repo := memdb.NewRepository()
+	repo := memdb.SetupTestRepository(t)
 	svc := New(repo)
 
 	coupon, err := svc.CreateCoupon(20, "AA1", 50)
