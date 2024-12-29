@@ -9,7 +9,7 @@ import (
 
 // Repository interface to memdb repository
 type Repository interface {
-	FindByCode(string) (*memdb.Coupon, error)
+	FindByCode(string) (memdb.Coupon, error)
 	Save(*memdb.Coupon) error
 }
 
@@ -85,8 +85,8 @@ func (s *Service) CreateCoupon(discount int, code string, minBasketValue int) (*
 
 // GetCoupons return a list of coupons based on the codes provided
 // It returns an error if case one of the code does not exist will
-func (s *Service) GetCoupons(codes []string) ([]*memdb.Coupon, error) {
-	coupons := make([]*memdb.Coupon, 0, len(codes))
+func (s *Service) GetCoupons(codes []string) ([]memdb.Coupon, error) {
+	coupons := make([]memdb.Coupon, 0, len(codes))
 	var errs []error
 
 	for _, code := range codes {

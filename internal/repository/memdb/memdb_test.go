@@ -12,14 +12,14 @@ func TestRepository_Save(t *testing.T) {
 	repo := NewRepository()
 
 	t.Run("Save and retrieve a valid coupon", func(t *testing.T) {
-		coupon := &Coupon{
+		coupon := Coupon{
 			ID:             "1",
 			Code:           "DISCOUNT10",
 			Discount:       10,
 			MinBasketValue: 50,
 		}
 
-		err := repo.Save(coupon)
+		err := repo.Save(&coupon)
 		assert.NoError(t, err, "Expected no error when saving a valid coupon")
 
 		storedCoupon, err := repo.FindByCode("DISCOUNT10")
@@ -28,24 +28,24 @@ func TestRepository_Save(t *testing.T) {
 	})
 
 	t.Run("Overwrite an existing coupon", func(t *testing.T) {
-		coupon1 := &Coupon{
+		coupon1 := Coupon{
 			ID:             "2",
 			Code:           "SAVE20",
 			Discount:       20,
 			MinBasketValue: 100,
 		}
 
-		coupon2 := &Coupon{
+		coupon2 := Coupon{
 			ID:             "3",
 			Code:           "SAVE20",
 			Discount:       25,
 			MinBasketValue: 150,
 		}
 
-		err := repo.Save(coupon1)
+		err := repo.Save(&coupon1)
 		assert.NoError(t, err, "Expected no error when saving the first coupon")
 
-		err = repo.Save(coupon2)
+		err = repo.Save(&coupon2)
 		assert.NoError(t, err, "Expected no error when overwriting the existing coupon")
 
 		storedCoupon, err := repo.FindByCode("SAVE20")
@@ -58,14 +58,14 @@ func TestRepository_FindByCode(t *testing.T) {
 	repo := NewRepository()
 
 	t.Run("Find existing coupon", func(t *testing.T) {
-		coupon := &Coupon{
+		coupon := Coupon{
 			ID:             "4",
 			Code:           "SUMMER20",
 			Discount:       20,
 			MinBasketValue: 100,
 		}
 
-		err := repo.Save(coupon)
+		err := repo.Save(&coupon)
 		assert.NoError(t, err, "Expected no error when saving a valid coupon")
 
 		retrievedCoupon, err := repo.FindByCode("SUMMER20")
@@ -84,14 +84,14 @@ func TestRepository_Delete(t *testing.T) {
 	repo := NewRepository()
 
 	t.Run("Delete existing coupon", func(t *testing.T) {
-		coupon := &Coupon{
+		coupon := Coupon{
 			ID:             "5",
 			Code:           "WINTER30",
 			Discount:       30,
 			MinBasketValue: 150,
 		}
 
-		err := repo.Save(coupon)
+		err := repo.Save(&coupon)
 		assert.NoError(t, err, "Expected no error when saving a valid coupon")
 
 	})

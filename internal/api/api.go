@@ -22,7 +22,7 @@ import (
 type Service interface {
 	ApplyCoupon(*service.Basket, string) error
 	CreateCoupon(discount int, code string, minBasketValue int) (*memdb.Coupon, error)
-	GetCoupons([]string) ([]*memdb.Coupon, error)
+	GetCoupons([]string) ([]memdb.Coupon, error)
 }
 
 // Config store main api settings

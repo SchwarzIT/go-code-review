@@ -43,18 +43,17 @@ var (
 
 // FindByCode retrieves a Coupon by its code.
 // It returns a copy of the Coupon to prevent external modifications.
-func (r *Repository) FindByCode(code string) (*Coupon, error) {
+func (r *Repository) FindByCode(code string) (Coupon, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	coupon, exists := r.entries[code]
 	if !exists {
-		return nil, ErrCouponNotFound
+		return Coupon{}, ErrCouponNotFound
 	}
 
 	// Return a copy to maintain immutability.
-	couponCopy := *coupon
-	return &couponCopy, nil
+	return *coupon, nil
 }
 
 // Save stores a Coupon in the repository.
