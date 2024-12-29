@@ -1,0 +1,22 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Improve api documentation
+"""
+
+
+
+[[Digest.Improvements]]
+Name = "12-add-api-documentation"
+Issue = 12
+Description = """
+Implement swagger to dev environment, add readme api documentation 
+"""
+
+
+

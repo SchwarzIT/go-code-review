@@ -1,0 +1,20 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Improve cache code
+"""
+
+
+[[Digest.Improvements]]
+Name = "16-make-memory-improviments"
+Issue = 16
+Description = """
+Better cache performance and enhanced safety with immutable data change the ApplyCoupon service
+"""
+
+

@@ -1,2 +1,109 @@
+# Binaries
+##############################
+# Exclude the binary executable
+/bin/
+/build/
+/dist/
 
+# Executable files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+
+# Coverage files
+*.out
+
+# Logs
+##############################
+*.log
+
+# Environment Variables
+##############################
+# Exclude environment variable files
+.env
+.env.local
+.env.*.local
+
+# Dependency directories
+##############################
+# If you are using Go modules, you typically don't need to commit the vendor directory.
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE and Editor directories
+##############################
+# Visual Studio Code
+.vscode/
+
+# GoLand
 .idea/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+
+# Emacs
+*~
+
+# JetBrains
+# User-specific stuff
+.idea/*
+!.idea/*.iml
+!.idea/modules.xml
+!.idea/*.xml
+
+# macOS specific files
+##############################
+.DS_Store
+
+# Windows specific files
+##############################
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux specific files
+##############################
+*~
+
+# Other files and directories to ignore
+##############################
+# Temporary files
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
+
+# Documentation generated files
+docs/generated/
+
+# Cache directories
+.cache/
+
+
+# Ignore personal test file
+test2.go
+
+
+# Ignore auto-generated Swagger files
+docs/swagger.json
+docs/swagger.yaml
+
+# If you generate additional Swagger files/folders
+docs/swagger_files/
+docs/*.lock
+
+

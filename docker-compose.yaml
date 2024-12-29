@@ -1,0 +1,12 @@
+services:
+  coupon_service_local:
+    build:
+      context: '.'
+      dockerfile: Dockerfile
+    environment:
+      - API_PORT=80 # default value
+      - API_ENV=development # default value
+    ports:
+      - '80:80'
+    volumes:
+      - ./data:/app/data

@@ -1,0 +1,21 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Add data persist
+"""
+
+
+
+[[Digest.Improvements]]
+Name = "17-add-data-persist"
+Issue = 17
+Description = """
+Create a local file to storage all coupons
+"""
+
+
