@@ -1,0 +1,19 @@
+[Metadata]
+
+Author = "Matheus Politano"
+Release_file_version = "2.1"
+
+[Description]
+
+Notes = """
+Make public data folder
+"""
+
+
+
+[[Digest.Bugs]]
+Name = "18-add-local-data"
+Issue = 18
+Description = """
+Run using golang was causing error with the data folder not exist, so i added in the repository with data example
+"""

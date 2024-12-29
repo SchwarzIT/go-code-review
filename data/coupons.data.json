@@ -1,0 +1,14 @@
+[
+  {
+    "id": "bc9c9819-76c6-4f04-911e-cd8ff675ca05",
+    "code": "AAA",
+    "discount": 10,
+    "min_basket_value": 120
+  },
+  {
+    "id": "81b60523-c571-4898-88c8-7806569c25a4",
+    "code": "BBB",
+    "discount": 20,
+    "min_basket_value": 200
+  }
+]
