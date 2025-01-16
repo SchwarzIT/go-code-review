@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 
 	"github.com/rs/zerolog"
@@ -16,6 +17,14 @@ import (
 
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	// I'm not sure I understand the purpose of this check.
+	// I moved this check to main and made it Warn instead of panic.
+	// For more accurate values in Container env we should use https://github.com/uber-go/automaxprocs or
+	// similar libs for setting up the gomaxprocs to the container's cpu quota.
+	if runtime.NumCPU() != 32 {
+		log.Warn().Msg("This API is meant to be run on 32 core machines")
+	}
 
 	cfg, err := config.New()
 	if err != nil {
