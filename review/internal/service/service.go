@@ -10,6 +10,7 @@ import (
 
 type Repository interface {
 	FindByCode(string) (entity.Coupon, error)
+	List(...string) ([]entity.Coupon, error)
 	Save(entity.Coupon) error
 	Delete(string) error
 }
@@ -24,7 +25,12 @@ func New(repo Repository) *Service {
 	}
 }
 
-func (s *Service) ApplyCoupon(basket entity.Basket, code string) (entity.Basket, error) {
+func (s *Service) ApplyCoupon(value, appliedDiscount int, code string) (entity.Basket, error) {
+	basket := entity.Basket{
+		Value:           value,
+		AppliedDiscount: appliedDiscount,
+	}
+
 	// return basket without changes if it's empty
 	if basket.Value <= 0 {
 		return basket, nil
@@ -81,16 +87,11 @@ func (s *Service) CreateCoupon(discount int, code string, minBasketValue int) er
 	return nil
 }
 
-func (s *Service) GetCoupons(codes []string) ([]entity.Coupon, error) {
-	coupons := make([]entity.Coupon, 0, len(codes))
-
-	for _, code := range codes {
-		coupon, err := s.repo.FindByCode(code)
-		if err != nil {
-			// TODO: define code type and implement Stringer interface to avoid printing full code in logs
-			return nil, fmt.Errorf("failed to get coupon by %q code: %w", code, err)
-		}
-		coupons = append(coupons, coupon)
+func (s *Service) ListCoupons(codes ...string) ([]entity.Coupon, error) {
+	coupons, err := s.repo.List(codes...)
+	if err != nil {
+		// TODO: define code type and implement Stringer interface to avoid printing full code in logs
+		return nil, fmt.Errorf("failed to get coupons: %w", err)
 	}
 
 	return coupons, nil

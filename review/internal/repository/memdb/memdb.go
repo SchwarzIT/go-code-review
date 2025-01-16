@@ -28,6 +28,30 @@ func (r *Repository) FindByCode(code string) (entity.Coupon, error) {
 	return coupon, nil
 }
 
+func (r *Repository) List(filter ...string) ([]entity.Coupon, error) {
+	r.RLock()
+	defer r.RUnlock()
+
+	// If filters are provided, return only the matching coupons
+	if len(filter) > 0 {
+		coupons := make([]entity.Coupon, 0, len(filter))
+		for _, code := range filter {
+			if coupon, ok := r.entries[code]; ok {
+				coupons = append(coupons, coupon)
+			}
+		}
+		return coupons, nil
+	}
+
+	// If no filters are provided, return all coupons
+	coupons := make([]entity.Coupon, 0, len(r.entries))
+	for _, coupon := range r.entries {
+		coupons = append(coupons, coupon)
+	}
+
+	return coupons, nil
+}
+
 func (r *Repository) Save(coupon entity.Coupon) error {
 	r.Lock()
 	defer r.Unlock()
