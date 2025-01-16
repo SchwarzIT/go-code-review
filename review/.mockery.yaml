@@ -1,0 +1,11 @@
+with-expecter: True
+issue-845-fix: True
+resolve-type-alias: False
+dir: internal/mocks
+outpkg: mocks
+filename: "{{ .InterfaceName | lower }}.go"
+all: True
+packages:
+    coupon_service/internal/service:
+        config:
+          recursive: True
