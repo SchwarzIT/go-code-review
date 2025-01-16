@@ -38,8 +38,7 @@ func (s *Service) ApplyCoupon(value, appliedDiscount int, code string) (entity.B
 
 	coupon, err := s.repo.FindByCode(code)
 	if err != nil {
-		// TODO: define code type and implement Stringer interface to avoid printing full code in logs
-		return entity.Basket{}, fmt.Errorf("failed to get coupon by %q code: %w", code, err)
+		return entity.Basket{}, fmt.Errorf("failed to get coupon: %w", err)
 	}
 
 	// check if we fit MinBasketValue constraint
@@ -61,8 +60,7 @@ func (s *Service) ApplyCoupon(value, appliedDiscount int, code string) (entity.B
 
 	// delete coupon because of successfull apply
 	if err := s.repo.Delete(code); err != nil {
-		// TODO: define code type and implement Stringer interface to avoid printing full code in logs
-		return entity.Basket{}, fmt.Errorf("failed to delete coupon by %q code: %w", code, err)
+		return entity.Basket{}, fmt.Errorf("failed to delete coupon: %w", err)
 	}
 
 	return basket, nil
@@ -90,7 +88,6 @@ func (s *Service) CreateCoupon(discount int, code string, minBasketValue int) er
 func (s *Service) ListCoupons(codes ...string) ([]entity.Coupon, error) {
 	coupons, err := s.repo.List(codes...)
 	if err != nil {
-		// TODO: define code type and implement Stringer interface to avoid printing full code in logs
 		return nil, fmt.Errorf("failed to get coupons: %w", err)
 	}
 
