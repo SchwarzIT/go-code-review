@@ -18,19 +18,29 @@ func New() *Repository {
 	}
 }
 
-func (r *Repository) FindByCode(code string) (*entity.Coupon, error) {
+func (r *Repository) FindByCode(code string) (entity.Coupon, error) {
 	r.RLock()
 	defer r.RUnlock()
 	coupon, ok := r.entries[code]
 	if !ok {
-		return nil, fmt.Errorf("coupon not found")
+		return entity.Coupon{}, fmt.Errorf("coupon not found")
 	}
-	return &coupon, nil
+	return coupon, nil
 }
 
 func (r *Repository) Save(coupon entity.Coupon) error {
 	r.Lock()
 	defer r.Unlock()
+	if _, ok := r.entries[coupon.Code]; ok {
+		return fmt.Errorf("coupon with provided code already exists")
+	}
 	r.entries[coupon.Code] = coupon
+	return nil
+}
+
+func (r *Repository) Delete(code string) error {
+	r.Lock()
+	defer r.Unlock()
+	delete(r.entries, code)
 	return nil
 }

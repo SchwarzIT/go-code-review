@@ -1,74 +1,97 @@
 package service
 
 import (
-	. "coupon_service/internal/service/entity"
 	"fmt"
 
 	"github.com/google/uuid"
+
+	"coupon_service/internal/service/entity"
 )
 
 type Repository interface {
-	FindByCode(string) (*Coupon, error)
-	Save(Coupon) error
+	FindByCode(string) (entity.Coupon, error)
+	Save(entity.Coupon) error
+	Delete(string) error
 }
 
 type Service struct {
 	repo Repository
 }
 
-func New(repo Repository) Service {
-	return Service{
+func New(repo Repository) *Service {
+	return &Service{
 		repo: repo,
 	}
 }
 
-func (s Service) ApplyCoupon(basket Basket, code string) (b *Basket, e error) {
-	b = &basket
+func (s *Service) ApplyCoupon(basket entity.Basket, code string) (entity.Basket, error) {
+	// return basket without changes if it's empty
+	if basket.Value <= 0 {
+		return basket, nil
+	}
+
 	coupon, err := s.repo.FindByCode(code)
 	if err != nil {
-		return nil, err
+		// TODO: define code type and implement Stringer interface to avoid printing full code in logs
+		return entity.Basket{}, fmt.Errorf("failed to get coupon by %q code: %w", code, err)
 	}
 
-	if b.Value > 0 {
-		b.AppliedDiscount = coupon.Discount
-		b.ApplicationSuccessful = true
-	}
-	if b.Value == 0 {
-		return
+	// check if we fit MinBasketValue constraint
+	if coupon.MinBasketValue > basket.Value {
+		return entity.Basket{}, fmt.Errorf("not enough value in basket: should be gte %d", coupon.MinBasketValue)
 	}
 
-	return nil, fmt.Errorf("Tried to apply discount to negative value")
+	diff := basket.Value - coupon.Discount
+	if diff < 0 {
+		basket.Value = 0
+		// apply discount until 0 value, the rest of the points are burned out
+		basket.AppliedDiscount += coupon.Discount + diff
+	} else {
+		basket.Value = diff
+		// apply full coupon
+		basket.AppliedDiscount += coupon.Discount
+	}
+	basket.ApplicationSuccessful = true
+
+	// delete coupon because of successfull apply
+	if err := s.repo.Delete(code); err != nil {
+		// TODO: define code type and implement Stringer interface to avoid printing full code in logs
+		return entity.Basket{}, fmt.Errorf("failed to delete coupon by %q code: %w", code, err)
+	}
+
+	return basket, nil
 }
 
-func (s Service) CreateCoupon(discount int, code string, minBasketValue int) any {
-	coupon := Coupon{
+func (s *Service) CreateCoupon(discount int, code string, minBasketValue int) error {
+	id, err := uuid.NewRandom()
+	if err != nil {
+		return fmt.Errorf("failed to generate coupon id: %w", err)
+	}
+
+	coupon := entity.Coupon{
 		Discount:       discount,
 		Code:           code,
 		MinBasketValue: minBasketValue,
-		ID:             uuid.NewString(),
+		ID:             id.String(),
 	}
 
 	if err := s.repo.Save(coupon); err != nil {
-		return err
+		return fmt.Errorf("failed to get coupon: %w", err)
 	}
 	return nil
 }
 
-func (s Service) GetCoupons(codes []string) ([]Coupon, error) {
-	coupons := make([]Coupon, 0, len(codes))
-	var e error = nil
+func (s *Service) GetCoupons(codes []string) ([]entity.Coupon, error) {
+	coupons := make([]entity.Coupon, 0, len(codes))
 
-	for idx, code := range codes {
+	for _, code := range codes {
 		coupon, err := s.repo.FindByCode(code)
 		if err != nil {
-			if e == nil {
-				e = fmt.Errorf("code: %s, index: %d", code, idx)
-			} else {
-				e = fmt.Errorf("%w; code: %s, index: %d", e, code, idx)
-			}
+			// TODO: define code type and implement Stringer interface to avoid printing full code in logs
+			return nil, fmt.Errorf("failed to get coupon by %q code: %w", code, err)
 		}
-		coupons = append(coupons, *coupon)
+		coupons = append(coupons, coupon)
 	}
 
-	return coupons, e
+	return coupons, nil
 }
