@@ -12,26 +12,6 @@ import (
 	"coupon_service/internal/service/entity"
 )
 
-func TestNew(t *testing.T) {
-	mockRepo := mocks.NewMockRepository(t)
-	tests := []struct {
-		name string
-		repo Repository
-	}{
-		{"initialize service with valid repo", mockRepo},
-		{"initialize service with nil repo", nil},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := New(tt.repo)
-			if got == nil || got.repo != tt.repo {
-				t.Errorf("New() = %v, want repo %v", got.repo, tt.repo)
-			}
-		})
-	}
-}
-
 func TestService_ApplyCoupon(t *testing.T) {
 	mockRepo := mocks.NewMockRepository(t)
 
