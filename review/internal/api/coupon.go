@@ -26,7 +26,11 @@ func (a *API) Apply(c *gin.Context) {
 		responseError(c, http.StatusInternalServerError, "Failed to apply coupon", err)
 		return
 	}
-	c.JSON(http.StatusOK, basket)
+	c.JSON(http.StatusOK, entity.ApplyCouponRes{
+		Value:                 basket.Value,
+		AppliedDiscount:       basket.AppliedDiscount,
+		ApplicationSuccessful: basket.ApplicationSuccessful,
+	})
 }
 
 func (a *API) Create(c *gin.Context) {
@@ -55,7 +59,18 @@ func (a *API) List(c *gin.Context) {
 		responseError(c, http.StatusInternalServerError, "Failed to list coupons", err)
 		return
 	}
-	c.JSON(http.StatusOK, coupons)
+	apiCoupons := make([]entity.Coupon, 0, len(coupons))
+	for _, c := range coupons {
+		apiCoupons = append(apiCoupons, entity.Coupon{
+			ID:             c.ID,
+			Code:           c.Code,
+			Discount:       c.Discount,
+			MinBasketValue: c.MinBasketValue,
+		})
+	}
+	c.JSON(http.StatusOK, entity.ListCouponsRes{
+		Coupons: apiCoupons,
+	})
 }
 
 func responseError(c *gin.Context, code int, msg string, err error) {
