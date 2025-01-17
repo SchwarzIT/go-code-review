@@ -10,6 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"coupon_service/internal/api"
+	"coupon_service/internal/app"
 	"coupon_service/internal/config"
 	"coupon_service/internal/repository/memdb"
 	"coupon_service/internal/service"
@@ -33,7 +34,8 @@ func main() {
 
 	repo := memdb.New()
 	svc := service.New(repo)
-	app := api.New(cfg.Host, cfg.Port, svc)
+	api := api.New(svc)
+	app := app.New(cfg.Host, cfg.Port, api.SetupRouter())
 
 	go func() {
 		if err := app.Start(); err != nil {
