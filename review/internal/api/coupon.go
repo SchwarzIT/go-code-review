@@ -13,20 +13,17 @@ import (
 func (a *API) Apply(c *gin.Context) {
 	code := c.Param("code")
 	if len(code) == 0 {
-		c.Status(http.StatusBadRequest)
-		log.Error().Msg("Empty coupon code")
+		responseError(c, http.StatusBadRequest, "Empty coupon code", nil)
 		return
 	}
 	apiReq := entity.ApplyCouponReq{}
 	if err := c.ShouldBindJSON(&apiReq); err != nil {
-		c.Status(http.StatusBadRequest)
-		log.Error().Err(err).Msg("Failed to bind JSON")
+		responseError(c, http.StatusBadRequest, "Failed to bind JSON", err)
 		return
 	}
 	basket, err := a.svc.ApplyCoupon(apiReq.Value, apiReq.AppliedDiscount, code)
 	if err != nil {
-		c.Status(http.StatusInternalServerError)
-		log.Error().Err(err).Msg("Failed to apply coupon")
+		responseError(c, http.StatusInternalServerError, "Failed to apply coupon", err)
 		return
 	}
 	c.JSON(http.StatusOK, basket)
@@ -35,14 +32,12 @@ func (a *API) Apply(c *gin.Context) {
 func (a *API) Create(c *gin.Context) {
 	apiReq := entity.CreateCouponReq{}
 	if err := c.ShouldBindJSON(&apiReq); err != nil {
-		c.Status(http.StatusBadRequest)
-		log.Error().Err(err).Msg("Failed to bind JSON")
+		responseError(c, http.StatusBadRequest, "Failed to bind JSON", err)
 		return
 	}
 	err := a.svc.CreateCoupon(apiReq.Discount, apiReq.Code, apiReq.MinBasketValue)
 	if err != nil {
-		c.Status(http.StatusInternalServerError)
-		log.Error().Err(err).Msg("Failed to create coupon")
+		responseError(c, http.StatusInternalServerError, "Failed to create coupon", err)
 		return
 	}
 	c.Status(http.StatusCreated)
@@ -57,9 +52,20 @@ func (a *API) List(c *gin.Context) {
 	}
 	coupons, err := a.svc.ListCoupons(codes...)
 	if err != nil {
-		c.Status(http.StatusInternalServerError)
-		log.Error().Err(err).Msg("Failed to list coupons")
+		responseError(c, http.StatusInternalServerError, "Failed to list coupons", err)
 		return
 	}
 	c.JSON(http.StatusOK, coupons)
+}
+
+func responseError(c *gin.Context, code int, msg string, err error) {
+	c.JSON(code, entity.Error{
+		Code: code,
+		Msg:  msg,
+	})
+	e := log.Error()
+	if err != nil {
+		e = e.Err(err)
+	}
+	e.Msg(msg)
 }
