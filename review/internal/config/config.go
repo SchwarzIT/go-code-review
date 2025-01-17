@@ -1,20 +1,24 @@
 package config
 
 import (
-	"coupon_service/internal/api"
-	"log"
+	"fmt"
 
 	"github.com/brumhard/alligotor"
 )
 
 type Config struct {
-	API api.Config
+	Host string
+	Port int
 }
 
-func New() Config {
-	cfg := Config{}
-	if err := alligotor.Get(&cfg); err != nil {
-		log.Fatal(err)
+func New() (Config, error) {
+	cfg := Config{
+		// set default values
+		Host: "0.0.0.0",
+		Port: 8080,
 	}
-	return cfg
+	if err := alligotor.Get(&cfg); err != nil {
+		return Config{}, fmt.Errorf("failed to load configurations: %w", err)
+	}
+	return cfg, nil
 }

@@ -1,14 +1,17 @@
 # build stage
-FROM golang:latest AS builder
+FROM golang:1.23 AS builder
 
-RUN apk add git gcc libc-dev
+WORKDIR /usr/src/app
 
-WORKDIR /go/src/coupon-service
+COPY go.mod go.sum ./
+RUN go mod download && go mod verify
 
 COPY . .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o /usr/local/bin/app cmd/coupon_service/*.go
 
-WORKDIR /go/src/coupon-service/cmd/export
-RUN go build -o main .
+FROM scratch
 
-ENTRYPOINT ./main
-EXPOSE 8080
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /usr/local/bin/app /app
+
+ENTRYPOINT ["/app"]

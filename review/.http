@@ -1,0 +1,42 @@
+# Create a new coupon
+POST http://localhost:8080/api/coupons
+Content-Type: application/json
+
+{
+  "discount": 20,
+  "code": "WINTER2025",
+  "minBasketValue": 500
+}
+
+###
+
+# Create a new coupon
+POST http://localhost:8080/api/coupons
+Content-Type: application/json
+
+{
+  "discount": 20,
+  "code": "SUMMER2025",
+  "minBasketValue": 500
+}
+
+###
+
+# Apply a coupon to a basket
+POST http://localhost:8080/api/coupons/SUMMER2025/basket
+Content-Type: application/json
+
+{
+  "value": 1000,
+  "appliedDiscount": 50
+}
+
+###
+
+# List all coupons (no filter)
+GET http://localhost:8080/api/coupons
+
+###
+
+# List specific coupons using a filter (comma-separated codes)
+GET http://localhost:8080/api/coupons?codes=SUMMER2025,FALL2025
