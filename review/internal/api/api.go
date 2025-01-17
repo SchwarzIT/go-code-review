@@ -1,15 +1,17 @@
 package api
 
 import (
+	"context"
+
 	"github.com/gin-gonic/gin"
 
 	"coupon_service/internal/service/entity"
 )
 
 type Service interface {
-	ApplyCoupon(int, int, string) (entity.Basket, error)
-	CreateCoupon(int, string, int) error
-	ListCoupons(...string) ([]entity.Coupon, error)
+	ApplyCoupon(context.Context, int, int, string) (entity.Basket, error)
+	CreateCoupon(context.Context, int, string, int) error
+	ListCoupons(context.Context, ...string) ([]entity.Coupon, error)
 }
 
 type API struct {

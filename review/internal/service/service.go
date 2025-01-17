@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -9,10 +10,10 @@ import (
 )
 
 type Repository interface {
-	FindByCode(string) (entity.Coupon, error)
-	List(...string) ([]entity.Coupon, error)
-	Save(entity.Coupon) error
-	Delete(string) error
+	FindByCode(context.Context, string) (entity.Coupon, error)
+	List(context.Context, ...string) ([]entity.Coupon, error)
+	Save(context.Context, entity.Coupon) error
+	Delete(context.Context, string) error
 }
 
 type Service struct {
@@ -25,7 +26,7 @@ func New(repo Repository) *Service {
 	}
 }
 
-func (s *Service) ApplyCoupon(value, appliedDiscount int, code string) (entity.Basket, error) {
+func (s *Service) ApplyCoupon(ctx context.Context, value, appliedDiscount int, code string) (entity.Basket, error) {
 	basket := entity.Basket{
 		Value:           value,
 		AppliedDiscount: appliedDiscount,
@@ -36,7 +37,7 @@ func (s *Service) ApplyCoupon(value, appliedDiscount int, code string) (entity.B
 		return basket, nil
 	}
 
-	coupon, err := s.repo.FindByCode(code)
+	coupon, err := s.repo.FindByCode(ctx, code)
 	if err != nil {
 		return entity.Basket{}, fmt.Errorf("failed to get coupon: %w", err)
 	}
@@ -59,14 +60,14 @@ func (s *Service) ApplyCoupon(value, appliedDiscount int, code string) (entity.B
 	basket.ApplicationSuccessful = true
 
 	// delete coupon because of successfull apply
-	if err := s.repo.Delete(code); err != nil {
+	if err := s.repo.Delete(ctx, code); err != nil {
 		return entity.Basket{}, fmt.Errorf("failed to delete coupon: %w", err)
 	}
 
 	return basket, nil
 }
 
-func (s *Service) CreateCoupon(discount int, code string, minBasketValue int) error {
+func (s *Service) CreateCoupon(ctx context.Context, discount int, code string, minBasketValue int) error {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return fmt.Errorf("failed to generate coupon id: %w", err)
@@ -79,14 +80,14 @@ func (s *Service) CreateCoupon(discount int, code string, minBasketValue int) er
 		ID:             id.String(),
 	}
 
-	if err := s.repo.Save(coupon); err != nil {
+	if err := s.repo.Save(ctx, coupon); err != nil {
 		return fmt.Errorf("failed to get coupon: %w", err)
 	}
 	return nil
 }
 
-func (s *Service) ListCoupons(codes ...string) ([]entity.Coupon, error) {
-	coupons, err := s.repo.List(codes...)
+func (s *Service) ListCoupons(ctx context.Context, codes ...string) ([]entity.Coupon, error) {
+	coupons, err := s.repo.List(ctx, codes...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get coupons: %w", err)
 	}

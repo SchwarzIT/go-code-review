@@ -1,6 +1,7 @@
 package memdb
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -18,7 +19,7 @@ func New() *Repository {
 	}
 }
 
-func (r *Repository) FindByCode(code string) (entity.Coupon, error) {
+func (r *Repository) FindByCode(ctx context.Context, code string) (entity.Coupon, error) {
 	r.RLock()
 	defer r.RUnlock()
 	coupon, ok := r.entries[code]
@@ -28,7 +29,7 @@ func (r *Repository) FindByCode(code string) (entity.Coupon, error) {
 	return coupon, nil
 }
 
-func (r *Repository) List(filter ...string) ([]entity.Coupon, error) {
+func (r *Repository) List(ctx context.Context, filter ...string) ([]entity.Coupon, error) {
 	r.RLock()
 	defer r.RUnlock()
 
@@ -52,7 +53,7 @@ func (r *Repository) List(filter ...string) ([]entity.Coupon, error) {
 	return coupons, nil
 }
 
-func (r *Repository) Save(coupon entity.Coupon) error {
+func (r *Repository) Save(ctx context.Context, coupon entity.Coupon) error {
 	r.Lock()
 	defer r.Unlock()
 	if _, ok := r.entries[coupon.Code]; ok {
@@ -62,7 +63,7 @@ func (r *Repository) Save(coupon entity.Coupon) error {
 	return nil
 }
 
-func (r *Repository) Delete(code string) error {
+func (r *Repository) Delete(ctx context.Context, code string) error {
 	r.Lock()
 	defer r.Unlock()
 	delete(r.entries, code)

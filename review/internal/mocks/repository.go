@@ -3,6 +3,7 @@
 package mocks
 
 import (
+	context "context"
 	entity "coupon_service/internal/service/entity"
 
 	mock "github.com/stretchr/testify/mock"
@@ -21,17 +22,17 @@ func (_m *MockRepository) EXPECT() *MockRepository_Expecter {
 	return &MockRepository_Expecter{mock: &_m.Mock}
 }
 
-// Delete provides a mock function with given fields: _a0
-func (_m *MockRepository) Delete(_a0 string) error {
-	ret := _m.Called(_a0)
+// Delete provides a mock function with given fields: _a0, _a1
+func (_m *MockRepository) Delete(_a0 context.Context, _a1 string) error {
+	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Delete")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string) error); ok {
-		r0 = rf(_a0)
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(_a0, _a1)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -45,14 +46,15 @@ type MockRepository_Delete_Call struct {
 }
 
 // Delete is a helper method to define mock.On call
-//   - _a0 string
-func (_e *MockRepository_Expecter) Delete(_a0 interface{}) *MockRepository_Delete_Call {
-	return &MockRepository_Delete_Call{Call: _e.mock.On("Delete", _a0)}
+//   - _a0 context.Context
+//   - _a1 string
+func (_e *MockRepository_Expecter) Delete(_a0 interface{}, _a1 interface{}) *MockRepository_Delete_Call {
+	return &MockRepository_Delete_Call{Call: _e.mock.On("Delete", _a0, _a1)}
 }
 
-func (_c *MockRepository_Delete_Call) Run(run func(_a0 string)) *MockRepository_Delete_Call {
+func (_c *MockRepository_Delete_Call) Run(run func(_a0 context.Context, _a1 string)) *MockRepository_Delete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
+		run(args[0].(context.Context), args[1].(string))
 	})
 	return _c
 }
@@ -62,14 +64,14 @@ func (_c *MockRepository_Delete_Call) Return(_a0 error) *MockRepository_Delete_C
 	return _c
 }
 
-func (_c *MockRepository_Delete_Call) RunAndReturn(run func(string) error) *MockRepository_Delete_Call {
+func (_c *MockRepository_Delete_Call) RunAndReturn(run func(context.Context, string) error) *MockRepository_Delete_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// FindByCode provides a mock function with given fields: _a0
-func (_m *MockRepository) FindByCode(_a0 string) (entity.Coupon, error) {
-	ret := _m.Called(_a0)
+// FindByCode provides a mock function with given fields: _a0, _a1
+func (_m *MockRepository) FindByCode(_a0 context.Context, _a1 string) (entity.Coupon, error) {
+	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindByCode")
@@ -77,17 +79,17 @@ func (_m *MockRepository) FindByCode(_a0 string) (entity.Coupon, error) {
 
 	var r0 entity.Coupon
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (entity.Coupon, error)); ok {
-		return rf(_a0)
+	if rf, ok := ret.Get(0).(func(context.Context, string) (entity.Coupon, error)); ok {
+		return rf(_a0, _a1)
 	}
-	if rf, ok := ret.Get(0).(func(string) entity.Coupon); ok {
-		r0 = rf(_a0)
+	if rf, ok := ret.Get(0).(func(context.Context, string) entity.Coupon); ok {
+		r0 = rf(_a0, _a1)
 	} else {
 		r0 = ret.Get(0).(entity.Coupon)
 	}
 
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(_a0)
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -101,14 +103,15 @@ type MockRepository_FindByCode_Call struct {
 }
 
 // FindByCode is a helper method to define mock.On call
-//   - _a0 string
-func (_e *MockRepository_Expecter) FindByCode(_a0 interface{}) *MockRepository_FindByCode_Call {
-	return &MockRepository_FindByCode_Call{Call: _e.mock.On("FindByCode", _a0)}
+//   - _a0 context.Context
+//   - _a1 string
+func (_e *MockRepository_Expecter) FindByCode(_a0 interface{}, _a1 interface{}) *MockRepository_FindByCode_Call {
+	return &MockRepository_FindByCode_Call{Call: _e.mock.On("FindByCode", _a0, _a1)}
 }
 
-func (_c *MockRepository_FindByCode_Call) Run(run func(_a0 string)) *MockRepository_FindByCode_Call {
+func (_c *MockRepository_FindByCode_Call) Run(run func(_a0 context.Context, _a1 string)) *MockRepository_FindByCode_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
+		run(args[0].(context.Context), args[1].(string))
 	})
 	return _c
 }
@@ -118,18 +121,19 @@ func (_c *MockRepository_FindByCode_Call) Return(_a0 entity.Coupon, _a1 error) *
 	return _c
 }
 
-func (_c *MockRepository_FindByCode_Call) RunAndReturn(run func(string) (entity.Coupon, error)) *MockRepository_FindByCode_Call {
+func (_c *MockRepository_FindByCode_Call) RunAndReturn(run func(context.Context, string) (entity.Coupon, error)) *MockRepository_FindByCode_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// List provides a mock function with given fields: _a0
-func (_m *MockRepository) List(_a0 ...string) ([]entity.Coupon, error) {
-	_va := make([]interface{}, len(_a0))
-	for _i := range _a0 {
-		_va[_i] = _a0[_i]
+// List provides a mock function with given fields: _a0, _a1
+func (_m *MockRepository) List(_a0 context.Context, _a1 ...string) ([]entity.Coupon, error) {
+	_va := make([]interface{}, len(_a1))
+	for _i := range _a1 {
+		_va[_i] = _a1[_i]
 	}
 	var _ca []interface{}
+	_ca = append(_ca, _a0)
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
 
@@ -139,19 +143,19 @@ func (_m *MockRepository) List(_a0 ...string) ([]entity.Coupon, error) {
 
 	var r0 []entity.Coupon
 	var r1 error
-	if rf, ok := ret.Get(0).(func(...string) ([]entity.Coupon, error)); ok {
-		return rf(_a0...)
+	if rf, ok := ret.Get(0).(func(context.Context, ...string) ([]entity.Coupon, error)); ok {
+		return rf(_a0, _a1...)
 	}
-	if rf, ok := ret.Get(0).(func(...string) []entity.Coupon); ok {
-		r0 = rf(_a0...)
+	if rf, ok := ret.Get(0).(func(context.Context, ...string) []entity.Coupon); ok {
+		r0 = rf(_a0, _a1...)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]entity.Coupon)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(...string) error); ok {
-		r1 = rf(_a0...)
+	if rf, ok := ret.Get(1).(func(context.Context, ...string) error); ok {
+		r1 = rf(_a0, _a1...)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -165,21 +169,22 @@ type MockRepository_List_Call struct {
 }
 
 // List is a helper method to define mock.On call
-//   - _a0 ...string
-func (_e *MockRepository_Expecter) List(_a0 ...interface{}) *MockRepository_List_Call {
+//   - _a0 context.Context
+//   - _a1 ...string
+func (_e *MockRepository_Expecter) List(_a0 interface{}, _a1 ...interface{}) *MockRepository_List_Call {
 	return &MockRepository_List_Call{Call: _e.mock.On("List",
-		append([]interface{}{}, _a0...)...)}
+		append([]interface{}{_a0}, _a1...)...)}
 }
 
-func (_c *MockRepository_List_Call) Run(run func(_a0 ...string)) *MockRepository_List_Call {
+func (_c *MockRepository_List_Call) Run(run func(_a0 context.Context, _a1 ...string)) *MockRepository_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]string, len(args)-0)
-		for i, a := range args[0:] {
+		variadicArgs := make([]string, len(args)-1)
+		for i, a := range args[1:] {
 			if a != nil {
 				variadicArgs[i] = a.(string)
 			}
 		}
-		run(variadicArgs...)
+		run(args[0].(context.Context), variadicArgs...)
 	})
 	return _c
 }
@@ -189,22 +194,22 @@ func (_c *MockRepository_List_Call) Return(_a0 []entity.Coupon, _a1 error) *Mock
 	return _c
 }
 
-func (_c *MockRepository_List_Call) RunAndReturn(run func(...string) ([]entity.Coupon, error)) *MockRepository_List_Call {
+func (_c *MockRepository_List_Call) RunAndReturn(run func(context.Context, ...string) ([]entity.Coupon, error)) *MockRepository_List_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Save provides a mock function with given fields: _a0
-func (_m *MockRepository) Save(_a0 entity.Coupon) error {
-	ret := _m.Called(_a0)
+// Save provides a mock function with given fields: _a0, _a1
+func (_m *MockRepository) Save(_a0 context.Context, _a1 entity.Coupon) error {
+	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Save")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(entity.Coupon) error); ok {
-		r0 = rf(_a0)
+	if rf, ok := ret.Get(0).(func(context.Context, entity.Coupon) error); ok {
+		r0 = rf(_a0, _a1)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -218,14 +223,15 @@ type MockRepository_Save_Call struct {
 }
 
 // Save is a helper method to define mock.On call
-//   - _a0 entity.Coupon
-func (_e *MockRepository_Expecter) Save(_a0 interface{}) *MockRepository_Save_Call {
-	return &MockRepository_Save_Call{Call: _e.mock.On("Save", _a0)}
+//   - _a0 context.Context
+//   - _a1 entity.Coupon
+func (_e *MockRepository_Expecter) Save(_a0 interface{}, _a1 interface{}) *MockRepository_Save_Call {
+	return &MockRepository_Save_Call{Call: _e.mock.On("Save", _a0, _a1)}
 }
 
-func (_c *MockRepository_Save_Call) Run(run func(_a0 entity.Coupon)) *MockRepository_Save_Call {
+func (_c *MockRepository_Save_Call) Run(run func(_a0 context.Context, _a1 entity.Coupon)) *MockRepository_Save_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(entity.Coupon))
+		run(args[0].(context.Context), args[1].(entity.Coupon))
 	})
 	return _c
 }
@@ -235,7 +241,7 @@ func (_c *MockRepository_Save_Call) Return(_a0 error) *MockRepository_Save_Call 
 	return _c
 }
 
-func (_c *MockRepository_Save_Call) RunAndReturn(run func(entity.Coupon) error) *MockRepository_Save_Call {
+func (_c *MockRepository_Save_Call) RunAndReturn(run func(context.Context, entity.Coupon) error) *MockRepository_Save_Call {
 	_c.Call.Return(run)
 	return _c
 }

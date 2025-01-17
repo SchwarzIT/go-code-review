@@ -21,7 +21,7 @@ func (a *API) Apply(c *gin.Context) {
 		responseError(c, http.StatusBadRequest, "Failed to bind JSON", err)
 		return
 	}
-	basket, err := a.svc.ApplyCoupon(apiReq.Value, apiReq.AppliedDiscount, code)
+	basket, err := a.svc.ApplyCoupon(c.Request.Context(), apiReq.Value, apiReq.AppliedDiscount, code)
 	if err != nil {
 		responseError(c, http.StatusInternalServerError, "Failed to apply coupon", err)
 		return
@@ -35,7 +35,7 @@ func (a *API) Create(c *gin.Context) {
 		responseError(c, http.StatusBadRequest, "Failed to bind JSON", err)
 		return
 	}
-	err := a.svc.CreateCoupon(apiReq.Discount, apiReq.Code, apiReq.MinBasketValue)
+	err := a.svc.CreateCoupon(c.Request.Context(), apiReq.Discount, apiReq.Code, apiReq.MinBasketValue)
 	if err != nil {
 		responseError(c, http.StatusInternalServerError, "Failed to create coupon", err)
 		return
@@ -50,7 +50,7 @@ func (a *API) List(c *gin.Context) {
 	if codesParam != "" {
 		codes = strings.Split(codesParam, ",")
 	}
-	coupons, err := a.svc.ListCoupons(codes...)
+	coupons, err := a.svc.ListCoupons(c.Request.Context(), codes...)
 	if err != nil {
 		responseError(c, http.StatusInternalServerError, "Failed to list coupons", err)
 		return

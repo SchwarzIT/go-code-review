@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -15,14 +16,14 @@ import (
 func TestService_ApplyCoupon(t *testing.T) {
 	mockRepo := mocks.NewMockRepository(t)
 
-	mockRepo.On("FindByCode", "DISCOUNT10").Return(entity.Coupon{
+	mockRepo.On("FindByCode", mock.AnythingOfType("context.backgroundCtx"), "DISCOUNT10").Return(entity.Coupon{
 		Code:           "DISCOUNT10",
 		Discount:       10,
 		MinBasketValue: 50,
 	}, nil)
-	mockRepo.On("FindByCode", "INVALID").Return(entity.Coupon{}, fmt.Errorf("coupon not found"))
+	mockRepo.On("FindByCode", mock.AnythingOfType("context.backgroundCtx"), "INVALID").Return(entity.Coupon{}, fmt.Errorf("coupon not found"))
 
-	mockRepo.On("Delete", mock.Anything).Return(nil)
+	mockRepo.On("Delete", mock.AnythingOfType("context.backgroundCtx"), mock.Anything).Return(nil)
 
 	svc := New(mockRepo)
 
@@ -66,7 +67,7 @@ func TestService_ApplyCoupon(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotBasket, err := svc.ApplyCoupon(tt.value, tt.discount, tt.code)
+			gotBasket, err := svc.ApplyCoupon(context.Background(), tt.value, tt.discount, tt.code)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ApplyCoupon() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -80,8 +81,8 @@ func TestService_ApplyCoupon(t *testing.T) {
 
 func TestService_CreateCoupon(t *testing.T) {
 	mockRepo := mocks.NewMockRepository(t)
-	mockRepo.On("Save", mock.Anything).Return(nil).Once()
-	mockRepo.On("Save", mock.MatchedBy(func(c entity.Coupon) bool {
+	mockRepo.On("Save", mock.AnythingOfType("context.backgroundCtx"), mock.Anything).Return(nil).Once()
+	mockRepo.On("Save", mock.AnythingOfType("context.backgroundCtx"), mock.MatchedBy(func(c entity.Coupon) bool {
 		return c.Code == "DISCOUNT15"
 	})).Return(errors.New("coupon already exists")).Once()
 
@@ -112,7 +113,7 @@ func TestService_CreateCoupon(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := svc.CreateCoupon(tt.discount, tt.code, tt.minBasketValue)
+			err := svc.CreateCoupon(context.Background(), tt.discount, tt.code, tt.minBasketValue)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateCoupon() error = %v, wantErr %v", err, tt.wantErr)
 			}
